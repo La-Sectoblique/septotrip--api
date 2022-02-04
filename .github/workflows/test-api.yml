@@ -1,0 +1,16 @@
+name: test api
+
+on:
+  pull_request: 
+    branches: [ dev, master ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dépendencies
+      run: yarn
+    - name: Lint & build
+      run: yarn build
