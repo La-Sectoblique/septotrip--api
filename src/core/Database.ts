@@ -1,5 +1,11 @@
 import { Sequelize } from "sequelize";
+import fs from "fs";
+import path from "path";
 import Loggers from "./Logger";
+
+const MODEL_FOLDER = path.join(__dirname, "..", "models");
+
+const isDev = process.env.NODE_ENV !== "production";
 
 if(!process.env.POSTGRES_USERNAME || !process.env.POSTGRES_PASSWORD)
 	throw new Error("No credentials provided");
@@ -21,5 +27,13 @@ const sequelize = new Sequelize({
 });
 
 export default async function() {
-	await sequelize.sync({ alter: true });
+
+	const models = fs.readdirSync(MODEL_FOLDER);
+
+	for(const modelFile of models) {
+		const { init } = await import(path.join(MODEL_FOLDER, modelFile));
+		init(sequelize);
+	}
+
+	await sequelize.sync({ alter: isDev });
 }
