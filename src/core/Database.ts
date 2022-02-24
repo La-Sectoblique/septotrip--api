@@ -28,7 +28,7 @@ const sequelize = new Sequelize({
 
 export default async function() {
 
-	const models = fs.readdirSync(MODEL_FOLDER);
+	const models = fs.readdirSync(MODEL_FOLDER).filter(filename => !filename.endsWith(".map"));
 
 	for(const modelFile of models) {
 		const { init } = await import(path.join(MODEL_FOLDER, modelFile));
