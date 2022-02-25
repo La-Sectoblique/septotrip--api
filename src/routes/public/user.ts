@@ -1,8 +1,11 @@
 import { Router } from "express";
 import { register } from "../../controllers/User";
+import MethodNotAllowed from "../../middlewares/MethodNotAllowed";
 
 const router = Router();
 
-router.post("/register", register);
+router.route("/register")
+	.post(register)
+	.all(MethodNotAllowed);
 
 export default router;
