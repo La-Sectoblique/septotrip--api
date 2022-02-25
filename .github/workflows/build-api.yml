@@ -38,16 +38,13 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-    - uses: wshihadeh/docker-deployment-action@v1
-      name: Docker-Compose Remote Deployment
+    - name: executing remote ssh commands using ssh key
+      uses: appleboy/ssh-action@master
       with:
-        remote_docker_host: ${{ secrets.SSH_USER }}@septotrip.com
-        ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-        ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
-        stack_file_name: docker-compose.prod.yml
-        copy_stack_file: 'false'
-        deploy_path: /var/lib/docker-deploy
-        deployment_mode: docker-compose
-        pull_images_first: 'true'
-        args: --env-file /var/lib/docker-deploy/.env up -d api
-        pre_deployment_command_args: 'down api'
+        host: septotrip.com
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: 22
+        script: |
+          docker-compose -f docker-compose.prod.yml pull api
+          docker-compose -f docker-compose.prod.yml restart api
