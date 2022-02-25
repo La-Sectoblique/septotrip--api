@@ -13,6 +13,7 @@ jobs:
       with:
         submodules: recursive
     - name: Install dépendencies
-      run: yarn
+      run: yarn install
+
     - name: Lint & build
       run: yarn build
