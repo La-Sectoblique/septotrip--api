@@ -2,7 +2,8 @@ import { DataTypes, Model, Sequelize } from "sequelize";
 import { UserAttributes, UserInput } from "../types/models/User";
 
 export class User extends Model<UserAttributes, UserInput> implements UserAttributes {
-    declare email: string;
+    declare id: number;
+	declare email: string;
 	declare hashedPassword: string;
 }
 
