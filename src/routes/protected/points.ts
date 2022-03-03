@@ -1,15 +1,12 @@
 import { Router } from "express";
-import { login, register } from "../../controllers/User";
+import { addPoint, getPointsByUser } from "../../controllers/Point";
 import MethodNotAllowed from "../../middlewares/MethodNotAllowed";
 
 const router = Router();
 
-router.route("/register")
-	.post(register)
-	.all(MethodNotAllowed);
-
-router.route("/login")
-	.post(login)
+router.route("/points")
+	.get(getPointsByUser)
+	.post(addPoint)
 	.all(MethodNotAllowed);
 
 export default router;

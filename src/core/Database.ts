@@ -35,5 +35,5 @@ export default async function() {
 		init(sequelize);
 	}
 
-	await sequelize.sync({ alter: isDev });
+	await sequelize.sync({ alter: isDev, force: isDev });
 }
