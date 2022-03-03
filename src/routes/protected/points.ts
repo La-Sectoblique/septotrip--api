@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { addPoint } from "../../controllers/Point";
+import { addPoint, getPointsByUser } from "../../controllers/Point";
 import MethodNotAllowed from "../../middlewares/MethodNotAllowed";
 
 const router = Router();
 
 router.route("/points")
+	.get(getPointsByUser)
 	.post(addPoint)
 	.all(MethodNotAllowed);
 
