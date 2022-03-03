@@ -1,10 +1,8 @@
-import { Request, Response, Router } from "express";
-import MethodNotAllowed from "../../middlewares/MethodNotAllowed";
+import { Router } from "express";
+import pointRouter from "./points";
 
 const router = Router();
 
-router.route("/private")
-	.get((request: Request, response: Response) => response.json({ message: "stiti" }))
-	.all(MethodNotAllowed);
+router.use(pointRouter);
 
 export default router;
