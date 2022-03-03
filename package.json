@@ -6,7 +6,8 @@
   "scripts": {
     "build": "eslint && tsc",
     "dev": "nodemon src/index.ts",
-    "start": "node build/index.js"
+    "start": "node build/index.js",
+    "lint": "eslint"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",

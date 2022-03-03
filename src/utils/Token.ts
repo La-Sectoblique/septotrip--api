@@ -2,7 +2,7 @@ import { encode, decode, TAlgorithm } from "jwt-simple";
 import { PartialSession, EncodedSession, Session, DecodedSession, ExpirationStatus } from "../types/utils/Session";
 
 const ALGO: TAlgorithm = "HS512";
-const TOKEN_LIFETIME = 25 * 60 * 1000;
+const TOKEN_LIFETIME = /*25 * 60 * */ 1000;
 const GRACE_TIME = 5 * 60 * 1000;
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
@@ -26,12 +26,15 @@ export function encodeSession(partialSession: PartialSession): EncodedSession {
 	};
 }
 
-export function decodeSession(secretKey: string, sessionToken: string): DecodedSession {
+export function decodeSession(sessionToken: string): DecodedSession {
+
+	if(!JWT_SECRET_KEY) 
+		throw new Error("No JWT_SECRET_KEY provided");
 
 	let result: Session;
 	
 	try {
-		result = decode(sessionToken, secretKey, false, ALGO);
+		result = decode(sessionToken, JWT_SECRET_KEY, false, ALGO);
 	}
 	catch(e) {
 		if(e instanceof Error) {
