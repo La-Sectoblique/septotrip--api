@@ -30,3 +30,22 @@ export async function addPoint(request: Request, response: Response, next: NextF
 
 	response.json(point);
 }
+
+export async function removePoint(request: Request, response: Response) {
+
+	const point = response.locals.point;
+
+	await point.destroy();
+
+	response.json({ message: "Point deleted" });
+}
+
+export async function updatePoint(request: Request, response: Response) {
+	
+	const point: Point = response.locals.point;
+	const newAttributes: Partial<Point> = request.body;
+
+	await point.update(newAttributes);
+
+	return response.json(point);
+}
