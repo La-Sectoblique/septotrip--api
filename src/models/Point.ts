@@ -27,7 +27,7 @@ export function init(sequelize: Sequelize): void {
 			allowNull: false
 		},
 		authorId: {
-			type: DataTypes.INTEGER.UNSIGNED,
+			type: DataTypes.INTEGER,
 			allowNull: false
 		}
 	}, 

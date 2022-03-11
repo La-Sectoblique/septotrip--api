@@ -30,9 +30,19 @@ export default async function() {
 
 	const models = fs.readdirSync(MODEL_FOLDER).filter(filename => !filename.endsWith(".map"));
 
+	// initialisation
 	for(const modelFile of models) {
 		const { init } = await import(path.join(MODEL_FOLDER, modelFile));
 		init(sequelize);
+	}
+
+	// assiocations
+	for(const modelFile of models) {
+		const { associate } = await import(path.join(MODEL_FOLDER, modelFile));
+		
+		if(!associate) continue;
+
+		associate();
 	}
 
 	await sequelize.sync({ alter: isDev, force: isDev });
