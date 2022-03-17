@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addEntryToLogbook, getLogbookById, getLogbookEntries, getUserLogbooks, newLogbook, updateLogbook, getLogbookEntry, updateLogbookEntry, deleteLogbookEntry } from "../../controllers/Logbook";
+import { addEntryToLogbook, getLogbookById, getLogbookEntries, getUserLogbooks, newLogbook, updateLogbook, getLogbookEntry, updateLogbookEntry, deleteLogbookEntry, deleteLogbook } from "../../controllers/Logbook";
 import { LoadLogbookEntry } from "../../middlewares/loaders/LogbookEntryLoader";
 import { LoadLogbook } from "../../middlewares/loaders/LogbookLoader";
 import MethodNotAllowed from "../../middlewares/MethodNotAllowed";
@@ -15,6 +15,7 @@ router.route("/logbooks/:id")
 	.all(LoadLogbook)
 	.get(getLogbookById)
 	.put(updateLogbook)
+	.delete(deleteLogbook)
 	.all(MethodNotAllowed);
 
 router.route("/logbooks/:id/entries")
