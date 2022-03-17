@@ -1,4 +1,4 @@
-import { DataTypes, HasManyGetAssociationsMixin, Model, NonAttribute, Sequelize } from "sequelize";
+import { BelongsToManyGetAssociationsMixin, DataTypes, HasManyGetAssociationsMixin, Model, NonAttribute, Sequelize } from "sequelize";
 import { UserAttributes, UserInput } from "../types/models/User";
 import { Point } from "./Point";
 import { Trip } from "./Trip";
@@ -9,6 +9,8 @@ export class User extends Model<UserAttributes, UserInput> implements UserAttrib
 	declare hashedPassword: string;
 
 	declare getPoints: HasManyGetAssociationsMixin<Point>;
+	declare getTrips: BelongsToManyGetAssociationsMixin<Trip>;
+
 
 	declare points: NonAttribute<Point[]>
 	declare tripsCreated: NonAttribute<Trip[]>
@@ -42,5 +44,9 @@ export function associate(): void {
 		sourceKey: "id",
 		foreignKey: "authorId",
 		as: "tripsCreated"
+	});
+
+	User.belongsToMany(Trip, {
+		through: "Travelers"
 	});
 }

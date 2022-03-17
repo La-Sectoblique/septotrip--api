@@ -3,6 +3,7 @@ import { Trip } from "../models/Trip";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
 import UnauthorizedError from "../types/errors/UnauthorizedError";
 import { isTripInput } from "../types/models/Trip";
+import { isVisibility } from "../types/utils/Visibility";
 
 export async function createTrip(request: Request, response: Response, next: NextFunction) {
 
@@ -48,10 +49,15 @@ export async function getSpecificTrip(request: Request, response: Response) {
 	response.json(response.locals.trip);
 }
 
-export async function updateTrip(request: Request, response: Response) {
+export async function updateTrip(request: Request, response: Response, next: NextFunction) {
 
 	const trip: Trip = response.locals.trip;
 	const newAttributes: Partial<Trip> = request.body;
+
+	if(newAttributes.visibility && !isVisibility(newAttributes.visibility)) {
+		next({ message: "Invalid visibility", code: 404, name: "InvalidBodyError" } as InvalidBodyError);
+		return;
+	}
 
 	await trip.update(newAttributes);
 
