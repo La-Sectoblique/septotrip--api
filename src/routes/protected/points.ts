@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { addPoint, getPointsByUser, removePoint, updatePoint } from "../../controllers/Point";
 import MethodNotAllowed from "../../middlewares/MethodNotAllowed";
-import { LoadPoint } from "../../middlewares/PointLoader";
+import { LoadPoint } from "../../middlewares/loaders/PointLoader";
 
 const router = Router();
 

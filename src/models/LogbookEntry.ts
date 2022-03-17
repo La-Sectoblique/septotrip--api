@@ -2,7 +2,7 @@ import { DataTypes, Model, NonAttribute, Sequelize } from "sequelize";
 import { LogbookEntryAttributes, LogbookEntryInput } from "../types/models/Logbook";
 import { Logbook } from "./Logbook";
 
-export class LogbookEntry extends Model<LogbookEntryAttributes, LogbookEntryInput > implements LogbookEntryAttributes {
+export class LogbookEntry extends Model<LogbookEntryAttributes, LogbookEntryInput> implements LogbookEntryAttributes {
 	declare title: string;
 	declare text?: string | undefined;
 

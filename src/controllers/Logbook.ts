@@ -72,3 +72,28 @@ export async function getLogbookEntries(request: Request, response: Response) {
 
 	response.json(entries);
 }
+
+export async function getLogbookEntry(request: Request, response: Response) {
+	const entry: LogbookEntry = response.locals.entry;
+
+	return response.json(entry);
+}
+
+export async function updateLogbookEntry(request: Request, response: Response) {
+
+	const entry: LogbookEntry = response.locals.entry;
+	const newAttributes: Partial<LogbookEntry> = request.body;
+
+	await entry.update(newAttributes);
+
+	return response.json(entry);
+}
+
+export async function deleteLogbookEntry(request: Request, response: Response) {
+
+	const entry: LogbookEntry = response.locals.entry;
+
+	await entry.destroy();
+
+	response.json({ message: "Entry deleted" });
+}
