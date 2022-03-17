@@ -10,7 +10,7 @@ router.route("/points")
 	.post(addPoint)
 	.all(MethodNotAllowed);
 
-router.route("/points/:id")
+router.route("/points/:pointId")
 	.all(LoadPoint)
 	.delete(removePoint)
 	.put(updatePoint)

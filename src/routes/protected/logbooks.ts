@@ -11,20 +11,20 @@ router.route("/logbooks")
 	.post(newLogbook)
 	.all(MethodNotAllowed);
 
-router.route("/logbooks/:id")
+router.route("/logbooks/:logbookId")
 	.all(LoadLogbook)
 	.get(getLogbookById)
 	.put(updateLogbook)
 	.delete(deleteLogbook)
 	.all(MethodNotAllowed);
 
-router.route("/logbooks/:id/entries")
+router.route("/logbooks/:logbookId/entries")
 	.all(LoadLogbook)
 	.get(getLogbookEntries)
 	.post(addEntryToLogbook)
 	.all(MethodNotAllowed);
 
-router.route("/logbooks/:id/entries/:entryId")
+router.route("/logbooks/:logbookId/entries/:entryId")
 	.all(LoadLogbook)
 	.all(LoadLogbookEntry)
 	.get(getLogbookEntry)
