@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { Logbook } from "../models/Logbook";
 import { User } from "../models/User";
 import InexistantResourceError from "../types/errors/InexistantResourceError";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
@@ -36,8 +37,14 @@ export async function register(request: Request, response: Response, next: NextF
 		hashedPassword
 	};
 
-	await User.create(input);
+	const user = await User.create(input);
 	response.json({ message: "User created ! Please log in" });
+
+	await Logbook.create({
+		name: "Votre journal",
+		authorId: user.id
+	});
+
 	return;
 }
 

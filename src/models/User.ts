@@ -27,7 +27,9 @@ export function init(sequelize: Sequelize): void {
 		sequelize,
 		tableName: "User"
 	});
+}
 
+export function associate(): void {
 	User.hasMany(Point, {
 		sourceKey: "id",
 		foreignKey: "authorId",
