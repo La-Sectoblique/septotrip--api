@@ -1,6 +1,7 @@
-import { DataTypes, HasManyGetAssociationsMixin, Model, NonAttribute, Sequelize } from "sequelize";
+import { DataTypes, Model, NonAttribute, Sequelize } from "sequelize";
 import { LogbookAttributes, LogbookInput } from "../types/models/Logbook";
 import { LogbookEntry } from "./LogbookEntry";
+import { Trip } from "./Trip";
 import { User } from "./User";
 
 export class Logbook extends Model<LogbookAttributes, LogbookInput> implements LogbookAttributes {
@@ -9,9 +10,10 @@ export class Logbook extends Model<LogbookAttributes, LogbookInput> implements L
 	declare authorId: number;
 	declare author: NonAttribute<User>; 
 
-	declare entries: NonAttribute<LogbookEntry[]>;
+	declare tripId: number;
+	declare trip: NonAttribute<Trip>;
 
-	declare getEntries: HasManyGetAssociationsMixin<LogbookEntry>;
+	declare entries: NonAttribute<LogbookEntry[]>;
 }
 
 export function init(sequelize: Sequelize): void {
@@ -21,6 +23,10 @@ export function init(sequelize: Sequelize): void {
 			allowNull: false
 		},
 		authorId: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		tripId: {
 			type: DataTypes.INTEGER,
 			allowNull: false
 		}

@@ -1,19 +1,18 @@
 import { NextFunction, Request, Response } from "express";
-import { Logbook } from "../models/Logbook";
 import { User } from "../models/User";
 import InexistantResourceError from "../types/errors/InexistantResourceError";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
 import InvalidPasswordError from "../types/errors/InvalidPasswordError";
 import RessourceAlreadyExistError from "../types/errors/RessourceAlreadyExistError";
 import { UserInput } from "../types/models/User";
-import { isCredentials } from "../types/utils/Credentials";
+import { isLoginCredentials, isRegisterCredentials } from "../types/utils/Credentials";
 import Hash from "../utils/Hash";
 import { encodeSession } from "../utils/Token";
 
 
 export async function register(request: Request, response: Response, next: NextFunction): Promise<void> {
 
-	if(!isCredentials(request.body)) {
+	if(!isRegisterCredentials(request.body)) {
 		next({ message: "Invalid request body", code: 400, name: "InvalidBodyError" } as InvalidBodyError);
 		return;
 	}
@@ -34,23 +33,19 @@ export async function register(request: Request, response: Response, next: NextF
 
 	const input: UserInput = { 
 		email: request.body.email, 
+		firstName: request.body.firstName,
+		lastName: request.body.lastName,
 		hashedPassword
 	};
 
-	const user = await User.create(input);
+	await User.create(input);
 	response.json({ message: "User created ! Please log in" });
-
-	await Logbook.create({
-		name: "Votre journal",
-		authorId: user.id
-	});
-
 	return;
 }
 
 export async function login(request: Request, response: Response, next: NextFunction): Promise<void> {
 
-	if(!isCredentials(request.body)) {
+	if(!isLoginCredentials(request.body)) {
 		next({ message: "Invalid request body", code: 400, name: "InvalidBodyError" } as InvalidBodyError);
 		return;
 	}
