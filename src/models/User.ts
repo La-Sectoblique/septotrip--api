@@ -6,6 +6,9 @@ import { Trip } from "./Trip";
 export class User extends Model<UserAttributes, UserInput> implements UserAttributes {
     declare id: number;
 	declare email: string;
+	declare firstName: string;
+	declare lastName: string;
+
 	declare hashedPassword: string;
 
 	declare getPoints: HasManyGetAssociationsMixin<Point>;
@@ -19,6 +22,15 @@ export class User extends Model<UserAttributes, UserInput> implements UserAttrib
 export function init(sequelize: Sequelize): void {
 	User.init({
 		email: {
+			type: DataTypes.STRING,
+			allowNull: false,
+			unique: true
+		},
+		firstName: {
+			type: DataTypes.STRING,
+			allowNull: false,
+		},
+		lastName: {
 			type: DataTypes.STRING,
 			allowNull: false
 		},

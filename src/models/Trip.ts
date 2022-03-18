@@ -1,17 +1,24 @@
-import { BelongsToManyGetAssociationsMixin, DataTypes, Model, NonAttribute, Sequelize } from "sequelize";
+import { BelongsToGetAssociationMixin, BelongsToManyAddAssociationMixin, BelongsToManyGetAssociationsMixin, BelongsToManyRemoveAssociationMixin, DataTypes, Model, NonAttribute, Sequelize } from "sequelize";
 import { TripAttributes, TripInput } from "../types/models/Trip";
 import { Visibility } from "../types/utils/Visibility";
+import { Point } from "./Point";
 import { User } from "./User";
 
 
 export class Trip extends Model<TripAttributes, TripInput> implements TripAttributes {
+	declare id: number;
 	declare name: string;
 	declare visibility: Visibility;
 
-	declare getTravelers: BelongsToManyGetAssociationsMixin<User>;
+	declare getUsers: BelongsToManyGetAssociationsMixin<User>;
+	declare addUser: BelongsToManyAddAssociationMixin<User, number>;
+	declare getUser: BelongsToGetAssociationMixin<User>;
+	declare removeUser: BelongsToManyRemoveAssociationMixin<User, number>;
 
 	declare authorId: number;
 	declare author: NonAttribute<User>;
+
+	declare points: NonAttribute<Point[]>;
 }
 
 export function init(sequelize: Sequelize): void {
@@ -37,5 +44,11 @@ export function init(sequelize: Sequelize): void {
 export function associate() {
 	Trip.belongsToMany(User, { 
 		through: "Travelers",
+	});
+
+	Trip.hasMany(Point, {
+		sourceKey: "id",
+		foreignKey: "tripId",
+		as: "points"
 	});
 }
