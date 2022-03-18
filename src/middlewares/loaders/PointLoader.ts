@@ -6,10 +6,10 @@ import NoIdProvidedError from "../../types/errors/NoIdProvidedError";
 
 export async function LoadPoint(request: Request, response: Response, next: NextFunction) {
 
-	const pointId = request.params?.pointId;
+	const pointId = parseInt(request.params?.pointId);
 
-	if(!pointId) {
-		next({ message: "No id provided", code: 400, name: "NoIdProvidedError" } as NoIdProvidedError);
+	if(!pointId || Number.isNaN(pointId)) {
+		next({ message: "No id or invalid id provided", code: 400, name: "NoIdProvidedError" } as NoIdProvidedError);
 		return;
 	}
 

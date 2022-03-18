@@ -6,10 +6,10 @@ import { LogbookEntryOutput } from "../../types/models/Logbook";
 
 export async function LoadLogbookEntry(request: Request, response: Response, next: NextFunction) {
 
-	const logbookEntryId: number | null = parseInt(request.params?.entryId);
+	const logbookEntryId = parseInt(request.params?.entryId);
 
-	if(!logbookEntryId) {
-		next({ message: "No id provided", code: 400, name: "NoIdProvidedError" } as NoIdProvidedError);
+	if(!logbookEntryId || Number.isNaN(logbookEntryId)) {
+		next({ message: "No id or invalid id provided", code: 400, name: "NoIdProvidedError" } as NoIdProvidedError);
 		return;
 	}
 

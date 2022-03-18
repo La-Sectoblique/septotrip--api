@@ -6,10 +6,10 @@ import NoIdProvidedError from "../../types/errors/NoIdProvidedError";
 
 export async function LoadTrip(request: Request, response: Response, next: NextFunction) {
 
-	const tripId = request.params?.tripId;
+	const tripId = parseInt(request.params?.tripId);
 
-	if(!tripId) {
-		next({ message: "No id provided", code: 400, name: "NoIdProvidedError" } as NoIdProvidedError);
+	if(!tripId || Number.isNaN(tripId)) {
+		next({ message: "No id or invalid id provided", code: 400, name: "NoIdProvidedError" } as NoIdProvidedError);
 		return;
 	}
 

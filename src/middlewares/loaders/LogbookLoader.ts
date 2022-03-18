@@ -6,10 +6,10 @@ import NoIdProvidedError from "../../types/errors/NoIdProvidedError";
 
 export async function LoadLogbook(request: Request, response: Response, next: NextFunction) {
 
-	const logbookId = request.params?.logbookId;
+	const logbookId = parseInt(request.params?.logbookId);
 
-	if(!logbookId) {
-		next({ message: "No id provided", code: 400, name: "NoIdProvidedError" } as NoIdProvidedError);
+	if(!logbookId || Number.isNaN(logbookId)) {
+		next({ message: "No id or invalid id provided", code: 400, name: "NoIdProvidedError" } as NoIdProvidedError);
 		return;
 	}
 
