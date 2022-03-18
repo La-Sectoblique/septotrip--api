@@ -29,6 +29,7 @@ export async function getTripLogbooks(request: Request, response: Response) {
 export async function newLogbook(request: Request, response: Response, next: NextFunction) {
 	const input = {
 		authorId: response.locals.session.id,
+		tripId: response.locals.trip.id,
 		...request.body
 	};
 

@@ -9,12 +9,12 @@ const router = Router();
 
 router.route("/logbooks")
 	.get(getUserLogbooks)
-	.post(newLogbook)
 	.all(MethodNotAllowed);
 
 router.route("/trips/:tripId/logbooks")
 	.all(LoadTrip)
 	.get(getTripLogbooks)
+	.post(newLogbook)
 	.all(MethodNotAllowed);
 	
 router.route("/logbooks/:logbookId")
