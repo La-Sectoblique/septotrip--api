@@ -2,8 +2,9 @@ import { Response, NextFunction, Request } from "express";
 import InvalidTokenError from "../types/errors/InvalidTokenError";
 import { checkExpirationStatus, decodeSession, encodeSession } from "../utils/Token";
 import { DecodedSession, ExpirationStatus, Session } from "../types/utils/Session";
+import { User } from "../models/User";
 
-export function JWTVerification(request: Request, response: Response, next: NextFunction): void {
+export async function JWTVerification(request: Request, response: Response, next: NextFunction) {
 
 	const requestHeader = "Authorization";
 	const responseHeader = "X-Renewed-JWT-Token";
@@ -46,6 +47,11 @@ export function JWTVerification(request: Request, response: Response, next: Next
 	}
 	else {
 		session = decodedSession.session;
+	}
+
+	if(!(await User.findByPk(session.id))) {
+		next({ code: 401, message: "No user with this token", name: "InvalidTokenError" } as InvalidTokenError);
+		return;
 	}
 
 	response.locals = {
