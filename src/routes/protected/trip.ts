@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createTrip, deleteTrip, updateTrip, getSpecificTrip, getTripUsers, addingMemberToTrip, removeMemberFromTrip } from "../../controllers/Trip";
+import { createTrip, deleteTrip, updateTrip, getSpecificTrip, getTripUsers, addingMemberToTrip, removeMemberFromTrip, getUserTrips } from "../../controllers/Trip";
 import { LoadTrip } from "../../middlewares/loaders/TripLoader";
 import MethodNotAllowed from "../../middlewares/MethodNotAllowed";
 
@@ -7,6 +7,10 @@ const router = Router();
 
 router.route("/trips")
 	.post(createTrip)
+	.all(MethodNotAllowed);
+
+router.route("/trips/me")
+	.get(getUserTrips)
 	.all(MethodNotAllowed);
 
 router.route("/trips/:tripId")

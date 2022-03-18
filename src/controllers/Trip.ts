@@ -48,6 +48,16 @@ export async function getAllPublicTrips(request: Request, response: Response) {
 	response.json(trips);
 }
 
+export async function getUserTrips(request: Request, response: Response) {
+	const trips = await Trip.findAll({
+		where: {
+			authorId: response.locals.session.id
+		}
+	});
+
+	response.json(trips);
+}
+
 export async function getSpecificTrip(request: Request, response: Response) {
 	response.json(response.locals.trip);
 }
