@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { addEntryToLogbook, getLogbookById, getLogbookEntries, getUserLogbooks, newLogbook, updateLogbook, getLogbookEntry, updateLogbookEntry, deleteLogbookEntry, deleteLogbook } from "../../controllers/Logbook";
+import { addEntryToLogbook, getLogbookById, getLogbookEntries, getUserLogbooks, newLogbook, updateLogbook, getLogbookEntry, updateLogbookEntry, deleteLogbookEntry, deleteLogbook, getTripLogbooks } from "../../controllers/Logbook";
 import { LoadLogbookEntry } from "../../middlewares/loaders/LogbookEntryLoader";
 import { LoadLogbook } from "../../middlewares/loaders/LogbookLoader";
+import { LoadTrip } from "../../middlewares/loaders/TripLoader";
 import MethodNotAllowed from "../../middlewares/MethodNotAllowed";
 
 const router = Router();
@@ -11,6 +12,11 @@ router.route("/logbooks")
 	.post(newLogbook)
 	.all(MethodNotAllowed);
 
+router.route("/trips/:tripId/logbooks")
+	.all(LoadTrip)
+	.get(getTripLogbooks)
+	.all(MethodNotAllowed);
+	
 router.route("/logbooks/:logbookId")
 	.all(LoadLogbook)
 	.get(getLogbookById)
