@@ -49,11 +49,13 @@ export async function getAllPublicTrips(request: Request, response: Response) {
 }
 
 export async function getUserTrips(request: Request, response: Response) {
-	const trips = await Trip.findAll({
-		where: {
-			authorId: response.locals.session.id
-		}
-	});
+
+	const user = await User.findByPk(response.locals.session.id);
+
+	if(!user)
+		throw new Error("?");
+
+	const trips = await user.getTrips();
 
 	response.json(trips);
 }

@@ -76,3 +76,14 @@ export async function login(request: Request, response: Response, next: NextFunc
 
 	response.status(200).json({ message: "Logged in", session, email: existingUser.email });
 }
+
+export async function me(request: Request, response: Response) {
+
+	const user = await User.findByPk(response.locals.session.id, {
+		attributes: {
+			exclude: [ "hashedPassword" ]
+		}
+	});
+
+	response.json(user);
+}

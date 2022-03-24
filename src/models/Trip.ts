@@ -2,6 +2,7 @@ import { BelongsToGetAssociationMixin, BelongsToManyAddAssociationMixin, Belongs
 import { TripAttributes, TripInput } from "../types/models/Trip";
 import { Visibility } from "../types/utils/Visibility";
 import { Point } from "./Point";
+import { Step } from "./Step";
 import { User } from "./User";
 
 
@@ -19,6 +20,8 @@ export class Trip extends Model<TripAttributes, TripInput> implements TripAttrib
 	declare author: NonAttribute<User>;
 
 	declare points: NonAttribute<Point[]>;
+
+	declare steps: NonAttribute<Step[]>;
 }
 
 export function init(sequelize: Sequelize): void {
@@ -50,5 +53,11 @@ export function associate() {
 		sourceKey: "id",
 		foreignKey: "tripId",
 		as: "points"
+	});
+
+	Trip.hasMany(Step, {
+		sourceKey: "id",
+		foreignKey: "tripId",
+		as: "steps"
 	});
 }
