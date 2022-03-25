@@ -1,6 +1,6 @@
 import { DataTypes, Model, NonAttribute, Sequelize } from "sequelize";
 import { LocalisationPoint, PointAttributes, PointInput } from "../types/models/Point";
-import { Trip } from "./Trip";
+import { Step } from "./Step";
 import { User } from "./User";
 
 export class Point extends Model<PointAttributes, PointInput> implements PointAttributes {
@@ -11,8 +11,8 @@ export class Point extends Model<PointAttributes, PointInput> implements PointAt
 	declare authorId: number;
 	declare author: NonAttribute<User>;
 	
-	declare tripId: number;
-	declare trip: NonAttribute<Trip>;
+	declare stepId: number;
+	declare step: NonAttribute<Step>;
 }
 
 export function init(sequelize: Sequelize): void {
@@ -33,7 +33,7 @@ export function init(sequelize: Sequelize): void {
 			type: DataTypes.INTEGER,
 			allowNull: false
 		},
-		tripId: {
+		stepId: {
 			type: DataTypes.INTEGER,
 			allowNull: false
 		}
