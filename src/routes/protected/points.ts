@@ -1,19 +1,19 @@
 import { Router } from "express";
-import { addPoint, getPointsByUser, removePoint, updatePoint } from "../../controllers/Point";
+import { addPoint, getPointsByStep, removePoint, updatePoint } from "../../controllers/Point";
 import MethodNotAllowed from "../../middlewares/MethodNotAllowed";
 import { LoadPoint } from "../../middlewares/loaders/PointLoader";
-import { LoadTrip } from "../../middlewares/loaders/TripLoader";
+import { LoadStep } from "../../middlewares/loaders/StepLoader";
 
 const router = Router();
 
-router.route("/trips/:tripId/points")
-	.all(LoadTrip)
-	.get(getPointsByUser)
+router.route("/steps/:stepId/points")
+	.all(LoadStep)
+	.get(getPointsByStep)
 	.post(addPoint)
 	.all(MethodNotAllowed);
 
-router.route("/trips/:tripId/points/:pointId")
-	.all(LoadTrip)
+router.route("/points/:pointId")
+	.all(LoadStep)
 	.all(LoadPoint)
 	.delete(removePoint)
 	.put(updatePoint)
