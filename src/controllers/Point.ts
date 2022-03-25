@@ -3,12 +3,10 @@ import { Point } from "../models/Point";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
 import { isPointInput } from "../types/models/Point";
 
-export async function getPointsByUser(request: Request, response: Response) {
-
+export async function getPointsByStep(request: Request, response: Response) {
 	const points = await Point.findAll({
 		where: {
-			tripId: response.locals.trip.id,
-			authorId: response.locals.session.id
+			stepId: response.locals.step.id
 		}
 	});
 
@@ -19,7 +17,7 @@ export async function addPoint(request: Request, response: Response, next: NextF
 
 	const input = {
 		authorId: response.locals.session.id,
-		tripId: response.locals.trip.id,
+		stepId: response.locals.step.id,
 		...request.body
 	};
 
