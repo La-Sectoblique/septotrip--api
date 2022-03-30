@@ -7,7 +7,8 @@ import Loggers from "./Logger";
 const whitelist = [
 	"septotrip.com",
 	"localhost",
-	"localhost:3000"
+	"localhost:3000", 
+	"localhost:4200"
 ];
 
 const app = express();
