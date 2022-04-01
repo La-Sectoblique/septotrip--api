@@ -4,21 +4,10 @@ import fileUpload from "express-fileupload";
 import router from "../routes";
 import Loggers from "./Logger";
 
-const whitelist = [
-	"localhost",
-	"septotrip.com",
-	process.env.CLIENT_URL
-];
-
 const app = express();
 app.use(cors({
 	exposedHeaders: ["X-Renewed-JWT-Token"],
-	origin: (origin, cb) => {
-		if(whitelist.includes(origin) && origin)
-			cb(null, true);
-		else
-			cb(new Error("Not allowed by cors"));
-	}
+	origin: "*"
 }));
 app.use(fileUpload());
 app.use(express.json());

@@ -3,11 +3,10 @@ import { Point } from "../models/Point";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
 import { isPointInput } from "../types/models/Point";
 
-export async function getPointsByUser(request: Request, response: Response) {
-
+export async function getPointsByStep(request: Request, response: Response) {
 	const points = await Point.findAll({
 		where: {
-			authorId: response.locals.session.id
+			stepId: response.locals.step.id
 		}
 	});
 
@@ -18,6 +17,7 @@ export async function addPoint(request: Request, response: Response, next: NextF
 
 	const input = {
 		authorId: response.locals.session.id,
+		stepId: response.locals.step.id,
 		...request.body
 	};
 
@@ -29,4 +29,23 @@ export async function addPoint(request: Request, response: Response, next: NextF
 	const point = await Point.create(input);
 
 	response.json(point);
+}
+
+export async function removePoint(request: Request, response: Response) {
+
+	const point = response.locals.point;
+
+	await point.destroy();
+
+	response.json({ message: "Point deleted" });
+}
+
+export async function updatePoint(request: Request, response: Response) {
+	
+	const point: Point = response.locals.point;
+	const newAttributes: Partial<Point> = request.body;
+
+	await point.update(newAttributes);
+
+	return response.json(point);
 }

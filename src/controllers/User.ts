@@ -5,14 +5,14 @@ import InvalidBodyError from "../types/errors/InvalidBodyError";
 import InvalidPasswordError from "../types/errors/InvalidPasswordError";
 import RessourceAlreadyExistError from "../types/errors/RessourceAlreadyExistError";
 import { UserInput } from "../types/models/User";
-import { isCredentials } from "../types/utils/Credentials";
+import { isLoginCredentials, isRegisterCredentials } from "../types/utils/Credentials";
 import Hash from "../utils/Hash";
 import { encodeSession } from "../utils/Token";
 
 
 export async function register(request: Request, response: Response, next: NextFunction): Promise<void> {
 
-	if(!isCredentials(request.body)) {
+	if(!isRegisterCredentials(request.body)) {
 		next({ message: "Invalid request body", code: 400, name: "InvalidBodyError" } as InvalidBodyError);
 		return;
 	}
@@ -33,6 +33,8 @@ export async function register(request: Request, response: Response, next: NextF
 
 	const input: UserInput = { 
 		email: request.body.email, 
+		firstName: request.body.firstName,
+		lastName: request.body.lastName,
 		hashedPassword
 	};
 
@@ -43,7 +45,7 @@ export async function register(request: Request, response: Response, next: NextF
 
 export async function login(request: Request, response: Response, next: NextFunction): Promise<void> {
 
-	if(!isCredentials(request.body)) {
+	if(!isLoginCredentials(request.body)) {
 		next({ message: "Invalid request body", code: 400, name: "InvalidBodyError" } as InvalidBodyError);
 		return;
 	}
@@ -73,4 +75,15 @@ export async function login(request: Request, response: Response, next: NextFunc
 	});
 
 	response.status(200).json({ message: "Logged in", session, email: existingUser.email });
+}
+
+export async function me(request: Request, response: Response) {
+
+	const user = await User.findByPk(response.locals.session.id, {
+		attributes: {
+			exclude: [ "hashedPassword" ]
+		}
+	});
+
+	response.json(user);
 }
