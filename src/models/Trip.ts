@@ -10,6 +10,8 @@ export class Trip extends Model<TripAttributes, TripInput> implements TripAttrib
 	declare id: number;
 	declare name: string;
 	declare visibility: Visibility;
+	declare startDate?: Date | undefined;
+	declare endDate?: Date | undefined;
 
 	declare getUsers: BelongsToManyGetAssociationsMixin<User>;
 	declare addUser: BelongsToManyAddAssociationMixin<User, number>;
@@ -36,6 +38,14 @@ export function init(sequelize: Sequelize): void {
 		authorId: {
 			type: DataTypes.INTEGER,
 			allowNull: false
+		},
+		startDate: {
+			type: DataTypes.DATE,
+			allowNull: true
+		},
+		endDate: {
+			type: DataTypes.DATE,
+			allowNull: true
 		}
 	}, {
 		sequelize,
