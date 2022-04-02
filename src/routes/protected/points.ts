@@ -6,7 +6,7 @@ import { LoadTrip } from "../../middlewares/loaders/TripLoader";
 
 const router = Router();
 
-router.route("/trip/:tripId/points")
+router.route("/trips/:tripId/points")
 	.all(LoadTrip)
 	.get(getPointsByTrip)
 	.post(addPoint)
