@@ -26,9 +26,9 @@ export function init(sequelize: Sequelize): void {
 			allowNull: false
 		},
 		localisation: {
-            type: DataTypes.GEOMETRY("POINT"),
-            allowNull: false
-        },
+			type: DataTypes.GEOMETRY("POINT"),
+			allowNull: false
+		},
 		tripId: {
 			type: DataTypes.INTEGER,
 			allowNull: false
@@ -45,5 +45,4 @@ export function associate() {
 		foreignKey: "stepId",
 		as: "points"
 	});
-
 }
