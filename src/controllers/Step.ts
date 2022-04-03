@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
+import { Day } from "../models/Day";
 import { Step } from "../models/Step";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
-import { isStepInput } from "../types/models/Step";
+import { isStepInput, StepOutput } from "../types/models/Step";
 
 
 export async function addStep(request: Request, response: Response, next: NextFunction) {
@@ -16,7 +17,14 @@ export async function addStep(request: Request, response: Response, next: NextFu
 		return;
 	}
 
-	const step = await Step.create(input);
+	const step: StepOutput = await Step.create(input);
+
+	for(let i = 0; i < step.duration; i++) {
+		await Day.create({
+			number: i + 1,
+			stepId: step.id
+		});
+	}
 
 	response.json(step);
 }
@@ -39,11 +47,38 @@ export async function getSpecificStep(request: Request, response: Response) {
 	response.json(response.locals.step);
 }
 
+export async function getStepDays(request: Request, response: Response) {
+	response.json(await response.locals.step.getDays());
+}
+
 export async function updateStep(request: Request, response: Response) {
-	const step: Step = response.locals.step;
+	let step: Step = response.locals.step;
 	const newAttributes: Partial<Step> = request.body;
 
-	await step.update(newAttributes);
+	step = await step.update(newAttributes);
+
+	// if we add or remove some days
+	if(newAttributes.duration) {
+		const days = await step.getDays({
+			order: [
+				[ "number", "ASC" ]
+			]
+		});
+
+		if(days.length > newAttributes.duration) {
+			for(let i = newAttributes.duration; i < days.length; i++) {
+				await days[i].destroy();
+			}
+		}
+		else if(days.length < newAttributes.duration) {
+			for(let i = days.length; i < newAttributes.duration; i++) {
+				await Day.create({
+					number: i + 1,
+					stepId: step.id
+				});
+			}
+		}
+	}
 
 	response.json(step);
 }

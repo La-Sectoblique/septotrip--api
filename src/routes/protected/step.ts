@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { getPointsByStep } from "../../controllers/Point";
-import { addStep, deleteStep, getSpecificStep, getTripSteps, updateStep } from "../../controllers/Step";
+import { addStep, deleteStep, getSpecificStep, getStepDays, getTripSteps, updateStep } from "../../controllers/Step";
 import { LoadStep } from "../../middlewares/loaders/StepLoader";
 import { LoadTrip } from "../../middlewares/loaders/TripLoader";
 import MethodNotAllowed from "../../middlewares/MethodNotAllowed";
@@ -24,6 +24,11 @@ router.route("/steps/:stepId")
 router.route("/steps/:stepId/points")
 	.all(LoadStep)
 	.get(getPointsByStep)
+	.all(MethodNotAllowed);
+
+router.route("/steps/:stepId/days")
+	.all(LoadStep)
+	.get(getStepDays)
 	.all(MethodNotAllowed);
 
 export default router;
