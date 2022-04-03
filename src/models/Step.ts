@@ -8,6 +8,7 @@ export class Step extends Model<StepAttributes, StepInput> implements StepAttrib
 	declare name: string;
 	declare order: number;
 	declare localisation: LocalisationPoint;
+	declare duration: number;
 
 	declare tripId: number;
 	declare trip: NonAttribute<Trip>;
@@ -32,6 +33,14 @@ export function init(sequelize: Sequelize): void {
 		tripId: {
 			type: DataTypes.INTEGER,
 			allowNull: false
+		},
+		duration: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			defaultValue: 1,
+			validate: {
+				min: 1
+			}
 		}
 	}, {
 		sequelize,
