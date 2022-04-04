@@ -1,4 +1,4 @@
-import { BelongsToGetAssociationMixin, BelongsToManyAddAssociationMixin, BelongsToManyGetAssociationsMixin, BelongsToManyRemoveAssociationMixin, DataTypes, Model, NonAttribute, Sequelize } from "sequelize";
+import { BelongsToGetAssociationMixin, BelongsToManyAddAssociationMixin, BelongsToManyGetAssociationsMixin, BelongsToManyRemoveAssociationMixin, DataTypes, HasManyGetAssociationsMixin, Model, NonAttribute, Sequelize } from "sequelize";
 import { TripAttributes, TripInput } from "../types/models/Trip";
 import { Visibility } from "../types/utils/Visibility";
 import { Point } from "./Point";
@@ -22,6 +22,8 @@ export class Trip extends Model<TripAttributes, TripInput> implements TripAttrib
 	declare author: NonAttribute<User>; 
 
 	declare steps: NonAttribute<Step[]>;
+	declare getSteps: HasManyGetAssociationsMixin<Step>;
+
 	declare points: NonAttribute<Point[]>;
 }
 

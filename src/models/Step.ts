@@ -2,6 +2,7 @@ import { DataTypes, HasManyGetAssociationsMixin, Model, NonAttribute, Sequelize 
 import { LocalisationPoint } from "../types/models/Point";
 import { StepAttributes, StepInput } from "../types/models/Step";
 import { Day } from "./Day";
+import { Path } from "./Path";
 import { Point } from "./Point";
 import { Trip } from "./Trip";
 
@@ -17,6 +18,10 @@ export class Step extends Model<StepAttributes, StepInput> implements StepAttrib
 
 	declare days: NonAttribute<Day[]>;
 	declare getDays: HasManyGetAssociationsMixin<Day>;
+
+	// path to next step
+	declare pathId: number | undefined;
+	declare path: NonAttribute<Path>;
 
 	declare points: NonAttribute<Point[]>;
 }
@@ -45,6 +50,10 @@ export function init(sequelize: Sequelize): void {
 			validate: {
 				min: 1
 			}
+		},
+		pathId: {
+			type: DataTypes.INTEGER,
+			allowNull: true
 		}
 	}, {
 		sequelize,
