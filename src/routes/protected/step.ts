@@ -44,7 +44,7 @@ router.route("/steps/:stepId/path/after")
 	.get(getPathByStepOrigin)
 	.all(MethodNotAllowed);
 
-router.route("/trips/:tripId")
+router.route("/paths/:pathId")
 	.all(LoadPath)
 	.get(getPathById)
 	.put(updatePath)
