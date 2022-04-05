@@ -4,6 +4,7 @@ import logbookRouter from "./logbooks";
 import tripRouter from "./trip";
 import stepRouter from "./step";
 import userRouter from "./user";
+import dayRouter from "./day";
 
 
 const router = Router();
@@ -13,5 +14,6 @@ router.use(logbookRouter);
 router.use(tripRouter);
 router.use(stepRouter);
 router.use(userRouter);
+router.use(dayRouter);
 
 export default router;
