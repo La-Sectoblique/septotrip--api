@@ -23,6 +23,16 @@ export async function getPointsByStep(request: Request, response: Response) {
 	response.json(points);
 }
 
+export async function getPointsByDay(request: Request, response: Response) {
+	const points = await Point.findAll({
+		where: {
+			dayId: response.locals.day.id
+		}
+	});
+
+	response.json(points);
+}
+
 export async function addPoint(request: Request, response: Response, next: NextFunction) {
 
 	const input = {

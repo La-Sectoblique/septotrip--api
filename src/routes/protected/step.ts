@@ -33,7 +33,6 @@ router.route("/steps/:stepId/days")
 	.get(getStepDays)
 	.all(MethodNotAllowed);
 
-
 router.route("/steps/:stepId/path/before")
 	.all(LoadStep)
 	.get(getPathByStepDestination)

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Day } from "../models/Day";
 import { Path } from "../models/Path";
+import { Point } from "../models/Point";
 import { Step } from "../models/Step";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
 import { isStepInput, StepOutput } from "../types/models/Step";
@@ -26,7 +27,8 @@ export async function addStep(request: Request, response: Response, next: NextFu
 	for(let i = 0; i < step.duration; i++) {
 		await Day.create({
 			number: i + 1,
-			stepId: step.id
+			stepId: step.id,
+			description: ""
 		});
 	}
 
@@ -91,6 +93,15 @@ export async function updateStep(request: Request, response: Response) {
 
 		if(days.length > newAttributes.duration) {
 			for(let i = newAttributes.duration; i < days.length; i++) {
+
+				const points = await Point.findAll({
+					where: {
+						dayId: days[i].id
+					}
+				});
+
+				points.forEach( async p => await p.update({ dayId: undefined }) );
+
 				await days[i].destroy();
 			}
 		}
@@ -98,7 +109,8 @@ export async function updateStep(request: Request, response: Response) {
 			for(let i = days.length; i < newAttributes.duration; i++) {
 				await Day.create({
 					number: i + 1,
-					stepId: step.id
+					stepId: step.id,
+					description: ""
 				});
 			}
 		}
