@@ -35,6 +35,7 @@ export function init(sequelize: Sequelize): void {
 		},
 		visibility: {
 			type: DataTypes.STRING,
+			values: [ "public", "private" ],
 			allowNull: false
 		},
 		authorId: {
