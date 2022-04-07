@@ -6,7 +6,7 @@ import NoIdProvidedError from "../../types/errors/NoIdProvidedError";
 
 export async function LoadStep(request: Request, response: Response, next: NextFunction) {
 
-	const stepId = request.params?.stepId;
+	const stepId = parseInt(request.params?.stepId);
 
 	if(!stepId) {
 		next({ message: "No id provided", code: 400, name: "NoIdProvidedError" } as NoIdProvidedError);
