@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import FileManagement from "../core/FileManagement";
 import { Logbook } from "../models/Logbook";
 import { Trip } from "../models/Trip";
 import { User } from "../models/User";
@@ -34,6 +35,8 @@ export async function createTrip(request: Request, response: Response, next: Nex
 		authorId: user.id,
 		tripId: trip.id
 	});
+
+	FileManagement.get().createBucketIfNotExist(`${process.env.NODE_ENV === "production" ? "prod" : "dev"}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
 
 	response.json(trip);
 }

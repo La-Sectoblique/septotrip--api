@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { FileMetadata } from "../models/FileMetadata";
 import { Point } from "../models/Point";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
 import { isPointInput } from "../types/models/Point";
@@ -68,4 +69,16 @@ export async function updatePoint(request: Request, response: Response) {
 	await point.update(newAttributes);
 
 	return response.json(point);
+}
+
+export async function getPointFiles(request: Request, response: Response) {
+	const point: Point = response.locals.point;
+
+	const files = await FileMetadata.findAll({
+		where: {
+			pointId: point.id
+		}
+	});
+
+	response.json(files);
 }

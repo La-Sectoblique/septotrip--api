@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { Day } from "../models/Day";
+import { FileMetadata } from "../models/FileMetadata";
 import { Path } from "../models/Path";
 import { Point } from "../models/Point";
 import { Step } from "../models/Step";
@@ -178,4 +179,16 @@ export async function deleteStep(request: Request, response: Response) {
 	}
 
 	response.json({ message: "Step deleted" });
+}
+
+export async function getStepFiles(request: Request, response: Response) {
+	const step: Step = response.locals.step;
+
+	const files = await FileMetadata.findAll({
+		where: {
+			stepId: step.id
+		}
+	});
+
+	response.json(files);
 }

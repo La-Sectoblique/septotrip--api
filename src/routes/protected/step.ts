@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { getPathById, getPathByStepDestination, getPathByStepOrigin, updatePath } from "../../controllers/Path";
+import { getPathById, getPathByStepDestination, getPathByStepOrigin, getPathFiles, updatePath } from "../../controllers/Path";
 import { getPointsByStep } from "../../controllers/Point";
-import { addStep, deleteStep, getSpecificStep, getStepDays, getTripSteps, updateStep } from "../../controllers/Step";
+import { addStep, deleteStep, getSpecificStep, getStepDays, getStepFiles, getTripSteps, updateStep } from "../../controllers/Step";
 import { LoadPath } from "../../middlewares/loaders/PathLoader";
 import { LoadStep } from "../../middlewares/loaders/StepLoader";
 import { LoadTrip } from "../../middlewares/loaders/TripLoader";
@@ -21,6 +21,11 @@ router.route("/steps/:stepId")
 	.get(getSpecificStep)
 	.put(updateStep)
 	.delete(deleteStep)
+	.all(MethodNotAllowed);
+
+router.route("/steps/:stepId/files")
+	.all(LoadStep)
+	.get(getStepFiles)
 	.all(MethodNotAllowed);
 
 router.route("/steps/:stepId/points")
@@ -47,6 +52,11 @@ router.route("/paths/:pathId")
 	.all(LoadPath)
 	.get(getPathById)
 	.put(updatePath)
+	.all(MethodNotAllowed);
+
+router.route("/paths/:pathId/files")
+	.all(LoadPath)
+	.get(getPathFiles)
 	.all(MethodNotAllowed);
 
 export default router;
