@@ -5,7 +5,6 @@ import { v4 } from "uuid";
 import FileManagement from "../core/FileManagement";
 import { FileMetadata } from "../models/FileMetadata";
 import { Trip } from "../models/Trip";
-import InexistantResourceError from "../types/errors/InexistantResourceError";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
 import { FileMetadataInput, isFileMetadataInput } from "../types/models/File";
 
@@ -20,6 +19,7 @@ export async function uploadFile(request: Request, response: Response, next: Nex
 	const metadata: FileMetadataInput = {
 		id: v4(),
 		mimeType: files.mimetype,
+		tripId: trip.id,
 		...request.body
 	};
 	
@@ -33,17 +33,9 @@ export async function uploadFile(request: Request, response: Response, next: Nex
 	response.json(fileMetadata);
 }
 
-export async function getFile(request: Request, response: Response, next: NextFunction) {
-	const id = request.params.id;
+export async function getFile(request: Request, response: Response) {
 	const trip: Trip = response.locals.trip;
-
-	if(!id) 
-		return next({ message: "No file id provided", code: 404, name: "InexistantResourceError" } as InexistantResourceError);
-
-	const metadata = await FileMetadata.findByPk(id);
-
-	if(!metadata)	
-		return next({ message: "Inexistant file", code: 404, name: "InexistantResourceError" } as InexistantResourceError);
+	const metadata = response.locals.fileMetada;
 
 	const res = await FileManagement.get().getFile(metadata.id, `${process.env.NODE_ENV === "production" ? "prod" : "dev"}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
 
@@ -76,5 +68,24 @@ export async function getFile(request: Request, response: Response, next: NextFu
 	response.setHeader("Content-Length", fileData.length);
 
 	response.status(200).send(fileData);
-	
+}
+
+export async function updateMetadata(request: Request, response: Response) {
+	const metadata: FileMetadata = response.locals.fileMetadata;
+	const newAttributes: Partial<FileMetadata> = request.body;
+
+	const meta = await metadata.update(newAttributes);
+
+	response.json(meta);
+}
+
+export async function deleteFile(request: Request, response: Response) {
+	const metadata: FileMetadata = response.locals.fileMetada;
+	const trip: Trip = response.locals.trip;
+
+	await FileManagement.get().deleteFile(metadata.id, `${process.env.NODE_ENV === "production" ? "prod" : "dev"}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
+
+	await FileMetadata.destroy();
+
+	response.json({ message: "File deleted" });
 }

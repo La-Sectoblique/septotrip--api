@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { FileMetadata } from "../models/FileMetadata";
 import { Path } from "../models/Path";
 
 
@@ -31,4 +32,16 @@ export async function updatePath(request: Request, response: Response) {
 
 export async function getPathById(request: Request, response: Response) {
 	response.json(response.locals.path);
+}
+
+export async function getPathFiles(request: Request, response: Response) {
+	const path: Path = response.locals.path;
+
+	const files = await FileMetadata.findAll({
+		where: {
+			pathId: path.id
+		}
+	});
+
+	response.json(files);
 }

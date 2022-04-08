@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { getFile, uploadFile } from "../../controllers/File";
+import { deleteFile, getFile, updateMetadata, uploadFile } from "../../controllers/File";
 import { createTrip, deleteTrip, updateTrip, getSpecificTrip, getTripUsers, addingMemberToTrip, removeMemberFromTrip, getUserTrips } from "../../controllers/Trip";
+import { LoadFileMetadata } from "../../middlewares/loaders/FileMetadataLoader";
 import { LoadTrip } from "../../middlewares/loaders/TripLoader";
 import MethodNotAllowed from "../../middlewares/MethodNotAllowed";
 
@@ -37,9 +38,12 @@ router.route("/trips/:tripId/file")
 	.post(uploadFile)
 	.all(MethodNotAllowed);
 
-router.route("/trips/:tripId/file/:id")
+router.route("/trips/:tripId/file/:fileId")
 	.all(LoadTrip)
+	.all(LoadFileMetadata)
 	.get(getFile)
+	.put(updateMetadata)
+	.delete(deleteFile)
 	.all(MethodNotAllowed);
 
 export default router;

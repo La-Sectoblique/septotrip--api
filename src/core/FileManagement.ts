@@ -64,4 +64,11 @@ export default class FileManagement {
 			ContentType: metadata.mimeType			
 		}).promise();
 	}
+
+	public async deleteFile(id: string, bucket: string) {
+		return this.S3.deleteObject({
+			Bucket: bucket,
+			Key: id
+		}).promise();
+	}
 }
