@@ -1,14 +1,27 @@
-import { DataTypes, Model, NonAttribute, Sequelize } from "sequelize";
+import { DataTypes, HasManyGetAssociationsMixin, Model, NonAttribute, Sequelize } from "sequelize";
+import { LocalisationPoint } from "../types/models/Point";
 import { StepAttributes, StepInput } from "../types/models/Step";
+import { Day } from "./Day";
+import { Path } from "./Path";
 import { Point } from "./Point";
 import { Trip } from "./Trip";
 
 export class Step extends Model<StepAttributes, StepInput> implements StepAttributes {
+	declare id: number;
+	declare duration: number;
 	declare name: string;
 	declare order: number;
+	declare localisation: LocalisationPoint;
 
 	declare tripId: number;
 	declare trip: NonAttribute<Trip>;
+
+	declare days: NonAttribute<Day[]>;
+	declare getDays: HasManyGetAssociationsMixin<Day>;
+
+	// path to next step
+	declare pathId: number | undefined;
+	declare path: NonAttribute<Path>;
 
 	declare points: NonAttribute<Point[]>;
 }
@@ -23,9 +36,24 @@ export function init(sequelize: Sequelize): void {
 			type: DataTypes.INTEGER,
 			allowNull: false
 		},
+		localisation: {
+			type: DataTypes.GEOMETRY("POINT"),
+			allowNull: false
+		},
 		tripId: {
 			type: DataTypes.INTEGER,
 			allowNull: false
+		},
+		duration: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			validate: {
+				min: 1
+			}
+		},
+		pathId: {
+			type: DataTypes.INTEGER,
+			allowNull: true
 		}
 	}, {
 		sequelize,
@@ -40,4 +68,9 @@ export function associate() {
 		as: "points"
 	});
 
+	Step.hasMany(Day, {
+		sourceKey: "id",
+		foreignKey: "stepId",
+		as: "days"
+	});
 }

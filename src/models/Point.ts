@@ -1,9 +1,13 @@
 import { DataTypes, Model, NonAttribute, Sequelize } from "sequelize";
 import { LocalisationPoint, PointAttributes, PointInput } from "../types/models/Point";
+import { Day } from "./Day";
 import { Step } from "./Step";
+import { Trip } from "./Trip";
 import { User } from "./User";
 
 export class Point extends Model<PointAttributes, PointInput> implements PointAttributes {
+	declare id: number;
+	
 	declare title: string;
 	declare description?: string | undefined;
 	declare localisation: LocalisationPoint;
@@ -11,8 +15,14 @@ export class Point extends Model<PointAttributes, PointInput> implements PointAt
 	declare authorId: number;
 	declare author: NonAttribute<User>;
 	
-	declare stepId: number;
-	declare step: NonAttribute<Step>;
+	declare tripId: number;
+	declare trip: NonAttribute<Trip>;
+
+	declare stepId?: number | undefined;
+	declare step?: NonAttribute<Step> | undefined;
+
+	declare dayId?: number | undefined;
+	declare day?: NonAttribute<Day> | undefined;
 }
 
 export function init(sequelize: Sequelize): void {
@@ -33,13 +43,29 @@ export function init(sequelize: Sequelize): void {
 			type: DataTypes.INTEGER,
 			allowNull: false
 		},
-		stepId: {
+		tripId: {
 			type: DataTypes.INTEGER,
 			allowNull: false
+		},
+		stepId: {
+			type: DataTypes.INTEGER,
+			allowNull: true
+		},
+		dayId: {
+			type: DataTypes.INTEGER,
+			allowNull: true
 		}
 	}, 
 	{
 		sequelize,
 		tableName: "Point"
+	});
+}
+
+export function associate() {
+	Point.belongsTo(Day, {
+		foreignKey: "dayId",
+		targetKey: "id",
+		as: "day"
 	});
 }

@@ -1,6 +1,7 @@
-import { BelongsToGetAssociationMixin, BelongsToManyAddAssociationMixin, BelongsToManyGetAssociationsMixin, BelongsToManyRemoveAssociationMixin, DataTypes, Model, NonAttribute, Sequelize } from "sequelize";
+import { BelongsToGetAssociationMixin, BelongsToManyAddAssociationMixin, BelongsToManyGetAssociationsMixin, BelongsToManyRemoveAssociationMixin, DataTypes, HasManyGetAssociationsMixin, Model, NonAttribute, Sequelize } from "sequelize";
 import { TripAttributes, TripInput } from "../types/models/Trip";
 import { Visibility } from "../types/utils/Visibility";
+import { Point } from "./Point";
 import { Step } from "./Step";
 import { User } from "./User";
 
@@ -9,6 +10,8 @@ export class Trip extends Model<TripAttributes, TripInput> implements TripAttrib
 	declare id: number;
 	declare name: string;
 	declare visibility: Visibility;
+	declare startDate?: Date | undefined;
+	declare endDate?: Date | undefined;
 
 	declare getUsers: BelongsToManyGetAssociationsMixin<User>;
 	declare addUser: BelongsToManyAddAssociationMixin<User, number>;
@@ -16,9 +19,12 @@ export class Trip extends Model<TripAttributes, TripInput> implements TripAttrib
 	declare removeUser: BelongsToManyRemoveAssociationMixin<User, number>;
 
 	declare authorId: number;
-	declare author: NonAttribute<User>;
+	declare author: NonAttribute<User>; 
 
 	declare steps: NonAttribute<Step[]>;
+	declare getSteps: HasManyGetAssociationsMixin<Step>;
+
+	declare points: NonAttribute<Point[]>;
 }
 
 export function init(sequelize: Sequelize): void {
@@ -29,11 +35,20 @@ export function init(sequelize: Sequelize): void {
 		},
 		visibility: {
 			type: DataTypes.STRING,
+			values: [ "public", "private" ],
 			allowNull: false
 		},
 		authorId: {
 			type: DataTypes.INTEGER,
 			allowNull: false
+		},
+		startDate: {
+			type: DataTypes.DATE,
+			allowNull: true
+		},
+		endDate: {
+			type: DataTypes.DATE,
+			allowNull: true
 		}
 	}, {
 		sequelize,
@@ -50,5 +65,11 @@ export function associate() {
 		sourceKey: "id",
 		foreignKey: "tripId",
 		as: "steps"
+	});
+
+	Trip.hasMany(Point, {
+		sourceKey: "id",
+		foreignKey: "tripId",
+		as: "points"
 	});
 }
