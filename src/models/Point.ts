@@ -6,6 +6,8 @@ import { Trip } from "./Trip";
 import { User } from "./User";
 
 export class Point extends Model<PointAttributes, PointInput> implements PointAttributes {
+	declare id: number;
+	
 	declare title: string;
 	declare description?: string | undefined;
 	declare localisation: LocalisationPoint;
