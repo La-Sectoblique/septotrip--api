@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import FileManagement from "../core/FileManagement";
-import { Logbook } from "../models/Logbook";
 import { Trip } from "../models/Trip";
 import { User } from "../models/User";
 import InexistantResourceError from "../types/errors/InexistantResourceError";
@@ -29,12 +28,6 @@ export async function createTrip(request: Request, response: Response, next: Nex
 	if(!user) throw new Error("No user wtf");
 	
 	trip.addUser(user);
-
-	await Logbook.create({ 
-		name: `Journal de ${user.firstName} ${user.lastName} sur ${trip.name}`,
-		authorId: user.id,
-		tripId: trip.id
-	});
 
 	FileManagement.get().createBucketIfNotExist(`${process.env.NODE_ENV === "production" ? "prod" : "dev"}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
 
@@ -135,12 +128,6 @@ export async function addingMemberToTrip(request: Request, response: Response, n
 	}
 
 	trip.addUser(newTraveler);
-
-	await Logbook.create({ 
-		name: `Journal de ${newTraveler.firstName} ${newTraveler.lastName} sur ${trip.name}`,
-		authorId: newTraveler.id,
-		tripId: trip.id
-	});
 
 	response.json({ message: "User added to trip" });
 }
