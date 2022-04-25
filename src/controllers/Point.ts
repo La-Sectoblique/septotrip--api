@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { Day } from "../models/Day";
 import { FileMetadata } from "../models/FileMetadata";
 import { Point } from "../models/Point";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
@@ -44,6 +45,11 @@ export async function addPoint(request: Request, response: Response, next: NextF
 
 	if(!isPointInput(input)) {
 		next({ message: "Invalid request body", code: 400, name: "InvalidBodyError" } as InvalidBodyError);
+		return;
+	}
+
+	if(input.dayId && !(await Day.findByPk(input.dayId))) {
+		next({ message: "Invalid day id", code: 400, name: "InvalidBodyError" } as InvalidBodyError);
 		return;
 	}
 
