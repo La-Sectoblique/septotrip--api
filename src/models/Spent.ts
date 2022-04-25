@@ -51,7 +51,7 @@ export function init(sequelize: Sequelize) {
 
 export function associate() {
 	Spent.belongsTo(User, {
-		foreignKey: "auhorId",
+		foreignKey: "authorId",
 		targetKey: "id",
 		as: "author"
 	});

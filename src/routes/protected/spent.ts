@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteSpent, getTripSpents, newSpent, updateSpent } from "../../controllers/Spent";
+import { deleteSpent, getBeneficiaries, getTripSpents, newSpent, updateBeneficiaries, updateSpent, getSpentById } from "../../controllers/Spent";
 import { LoadSpent } from "../../middlewares/loaders/SpentLoader";
 import { LoadTrip } from "../../middlewares/loaders/TripLoader";
 import MethodNotAllowed from "../../middlewares/MethodNotAllowed";
@@ -15,8 +15,15 @@ router.route("/trips/:tripId/spents")
 
 router.route("/spents/:spentId")
 	.all(LoadSpent)
+	.get(getSpentById)
 	.put(updateSpent)
 	.delete(deleteSpent)
+	.all(MethodNotAllowed);
+
+router.route("/spents/:spentId/beneficiaries")
+	.all(LoadSpent)
+	.get(getBeneficiaries)
+	.put(updateBeneficiaries)
 	.all(MethodNotAllowed);
 
 export default router;

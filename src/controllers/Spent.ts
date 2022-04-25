@@ -5,6 +5,7 @@ import { isSpentInput, SpentInput } from "../types/models/Spent";
 
 export async function newSpent(request: Request, response: Response, next: NextFunction) {
 	const input: SpentInput = {
+		authorId: response.locals.session.id,
 		tripId: response.locals.trip.id,
 		...request.body
 	};
@@ -13,6 +14,10 @@ export async function newSpent(request: Request, response: Response, next: NextF
 		return next({ message: "Invalid request body", code: 400, name: "InvalidBodyError" } as InvalidBodyError);
 
 	const spent = await Spent.create(input);
+
+	if(!request.body.beneficiaries) {
+		request.body.beneficiaries = [];
+	} 
 
 	for(const beneficiaryId of request.body.beneficiaries) {
 		await spent.addUser(beneficiaryId);
