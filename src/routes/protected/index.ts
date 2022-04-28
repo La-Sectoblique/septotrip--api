@@ -5,7 +5,7 @@ import tripRouter from "./trip";
 import stepRouter from "./step";
 import userRouter from "./user";
 import dayRouter from "./day";
-
+import spentRouter from "./spent";
 
 const router = Router();
 
@@ -15,5 +15,6 @@ router.use(tripRouter);
 router.use(stepRouter);
 router.use(userRouter);
 router.use(dayRouter);
+router.use(spentRouter);
 
 export default router;

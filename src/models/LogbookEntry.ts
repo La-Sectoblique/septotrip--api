@@ -1,13 +1,13 @@
-import { DataTypes, Model, NonAttribute, Sequelize } from "sequelize";
+import { DataTypes, Model, Sequelize } from "sequelize";
 import { LogbookEntryAttributes, LogbookEntryInput } from "../types/models/Logbook";
-import { Logbook } from "./Logbook";
+import { Trip } from "./Trip";
+import { User } from "./User";
 
 export class LogbookEntry extends Model<LogbookEntryAttributes, LogbookEntryInput> implements LogbookEntryAttributes {
 	declare title: string;
 	declare text?: string | undefined;
-
-	declare logbookId: number;
-	declare logbook: NonAttribute<Logbook>;
+	declare authorId: number;
+	declare tripId: number;
 }
 
 export function init(sequelize: Sequelize): void {
@@ -20,7 +20,11 @@ export function init(sequelize: Sequelize): void {
 			type: DataTypes.TEXT,
 			allowNull: true
 		},
-		logbookId: {
+		authorId: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		tripId: {
 			type: DataTypes.INTEGER,
 			allowNull: false
 		}
@@ -28,5 +32,19 @@ export function init(sequelize: Sequelize): void {
 	{
 		sequelize,
 		tableName: "LogbookEntry"
+	});
+}
+
+export function associate() {
+	LogbookEntry.belongsTo(User,{
+		foreignKey: "authorId",
+		targetKey: "id",
+		as: "author"
+	});
+
+	LogbookEntry.belongsTo(Trip, {
+		foreignKey: "tripId",
+		targetKey: "id",
+		as: "trip"
 	});
 }
