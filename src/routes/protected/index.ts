@@ -6,6 +6,7 @@ import stepRouter from "./step";
 import userRouter from "./user";
 import dayRouter from "./day";
 import spentRouter from "./spent";
+import todoRouter from "./todo";
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.use(stepRouter);
 router.use(userRouter);
 router.use(dayRouter);
 router.use(spentRouter);
+router.use(todoRouter);
 
 export default router;
