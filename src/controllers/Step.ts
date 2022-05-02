@@ -122,49 +122,34 @@ export async function updateStep(request: Request, response: Response) {
 
 export async function deleteStep(request: Request, response: Response) {
 	const step: Step = response.locals.step;
-	let nextStepId: number | null = null;
+	let nextStepId: number | undefined = undefined;
 
-	// update paths with deleted step as origin
+	// si l'étape mène a une autre étape, on récupère l'id du prochain step, et on suppr le voyage 
 	if(step.pathId) {
-		const pathWithStepAsOrigin = await Path.findByPk(step.pathId);
+		const pathWithStepForOrigin = await Path.findByPk(step.pathId);
+		
+		if(!pathWithStepForOrigin)
+			throw new Error("Bizar, le pathId est kc");
 
-		if(pathWithStepAsOrigin) {
-			nextStepId = pathWithStepAsOrigin.destinationId;
-			await pathWithStepAsOrigin?.destroy();
-		}	
+		nextStepId = pathWithStepForOrigin.destinationId;
+
+		await pathWithStepForOrigin.destroy();
 	}
 
-	// update paths with deleted step as destination
-	const pathWithStepAsDestination = await Path.findOne({
+	// si un chemin mène a cette étape, on update l'id de la destination 
+	const pathWithStepForDestination = await Path.findOne({ 
 		where: {
 			destinationId: step.id
 		}
 	});
 
-	// if step is not first
-	if(pathWithStepAsDestination) {
-		// and not last
-		if(nextStepId) {
-			await pathWithStepAsDestination.update({ destinationId: nextStepId });
-		}
-		else { // if step was last, update the new last step
-			const originStep = await Step.findOne({
-				where: {
-					pathId: pathWithStepAsDestination.id
-				}
-			});
-
-			if(!originStep) throw new Error("???? wat");
-
-			await originStep.update({ pathId: undefined });
-
-			await pathWithStepAsDestination.destroy();
-		}
+	if(pathWithStepForDestination) {
+		await pathWithStepForDestination.update({ destinationId: nextStepId });
 	}
 
 	await step.destroy();
-
-	// update steps order
+	
+	// on update l'ordre de chaque step
 	const steps = await Step.findAll({
 		where: {
 			tripId: step.tripId
