@@ -131,7 +131,7 @@ export async function deleteStep(request: Request, response: Response) {
 		if(pathWithStepAsOrigin) {
 			nextStepId = pathWithStepAsOrigin.destinationId;
 			await pathWithStepAsOrigin?.destroy();
-		}	
+		}
 	}
 
 	// update paths with deleted step as destination
