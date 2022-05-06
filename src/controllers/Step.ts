@@ -10,7 +10,11 @@ import { isStepInput, StepOutput } from "../types/models/Step";
 
 export async function addStep(request: Request, response: Response, next: NextFunction) {
 
-	const steps = await response.locals.trip.getSteps();
+	const steps = await Step.findAll({
+		where: {
+			tripId: response.locals.trip.id
+		}
+	});
 
 	const input = {
 		tripId: response.locals.trip.id,
@@ -33,21 +37,11 @@ export async function addStep(request: Request, response: Response, next: NextFu
 		});
 	}
 
-	if(step.order > 1) {
-		const path = await Path.create({
+	if(steps.length > 0) {
+		await Path.create({
 			description: "",
 			destinationId: step.id
 		});
-
-		const originStep = await Step.findOne({
-			where: {
-				order: step.order - 1
-			}
-		});
-
-		if(!originStep) throw new Error("Wtf ya probleme");
-
-		await originStep.update({ pathId: path.id });
 	}
 
 	response.json(step);
@@ -122,45 +116,13 @@ export async function updateStep(request: Request, response: Response) {
 
 export async function deleteStep(request: Request, response: Response) {
 	const step: Step = response.locals.step;
-	let nextStepId: number | null = null;
 
-	// update paths with deleted step as origin
-	if(step.pathId) {
-		const pathWithStepAsOrigin = await Path.findByPk(step.pathId);
-
-		if(pathWithStepAsOrigin) {
-			nextStepId = pathWithStepAsOrigin.destinationId;
-			await pathWithStepAsOrigin?.destroy();
-		}
-	}
-
-	// update paths with deleted step as destination
-	const pathWithStepAsDestination = await Path.findOne({
+	// delete step path
+	await Path.destroy({
 		where: {
 			destinationId: step.id
 		}
 	});
-
-	// if step is not first
-	if(pathWithStepAsDestination) {
-		// and not last
-		if(nextStepId) {
-			await pathWithStepAsDestination.update({ destinationId: nextStepId });
-		}
-		else { // if step was last, update the new last step
-			const originStep = await Step.findOne({
-				where: {
-					pathId: pathWithStepAsDestination.id
-				}
-			});
-
-			if(!originStep) throw new Error("???? wat");
-
-			await originStep.update({ pathId: undefined });
-
-			await pathWithStepAsDestination.destroy();
-		}
-	}
 
 	await step.destroy();
 
@@ -178,6 +140,26 @@ export async function deleteStep(request: Request, response: Response) {
 		await steps[i].update({ order: i + 1 });
 	}
 
+	// delete first step trip 
+	await Path.destroy({
+		where: {
+			destinationId: steps[0].id
+		}
+	});
+
+	// create all missing paths
+	for(const s of steps) {
+		const path = await Path.findOne({
+			where: {
+				destinationId: s.id
+			}
+		});
+	
+		if(path) continue;
+
+		await Path.create({ description: "", destinationId: s.id });
+	}
+
 	response.json({ message: "Step deleted" });
 }
 
@@ -191,4 +173,49 @@ export async function getStepFiles(request: Request, response: Response) {
 	});
 
 	response.json(files);
+}
+
+export async function updateStepOrder(request: Request, response: Response) {
+	const step: Step = response.locals.step;
+	const newOrder: number = request.body.newOrder;
+
+	// get all steps
+	const steps = await Step.findAll({
+		where: {
+			tripId: step.tripId
+		},
+		order: [
+			[ "order", "ASC" ]
+		]
+	});
+
+	// change order
+	steps.splice( steps.findIndex( s => s.id === step.id ), 1 );
+	steps.splice( steps.findIndex( s => s.order === newOrder ) ?? steps.length, 0, step );
+
+	for(let i = 0; i < steps.length; i++) {
+		await steps[i].update({ order: i + 1 });
+	}
+
+	// delete first step trip 
+	await Path.destroy({
+		where: {
+			destinationId: steps[0].id
+		}
+	});
+
+	// create all missing paths
+	for(const s of steps) {
+		const path = await Path.findOne({
+			where: {
+				destinationId: s.id
+			}
+		});
+	
+		if(path) continue;
+
+		await Path.create({ description: "", destinationId: s.id });
+	}
+
+	response.json(steps);
 }
