@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import { Day } from "../models/Day";
 import { FileMetadata } from "../models/FileMetadata";
 import { Path } from "../models/Path";
-import { Point } from "../models/Point";
 import { Step } from "../models/Step";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
 import { isStepInput, StepOutput } from "../types/models/Step";
@@ -88,15 +87,7 @@ export async function updateStep(request: Request, response: Response) {
 
 		if(days.length > newAttributes.duration) {
 			for(let i = newAttributes.duration; i < days.length; i++) {
-
-				const points = await Point.findAll({
-					where: {
-						dayId: days[i].id
-					}
-				});
-
-				points.forEach( async p => await p.update({ dayId: undefined }) );
-
+				await days[i].removePoints();
 				await days[i].destroy();
 			}
 		}

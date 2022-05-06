@@ -1,4 +1,14 @@
-import { DataTypes, Model, NonAttribute, Sequelize } from "sequelize";
+import { 
+	BelongsToGetAssociationMixin, 
+	BelongsToManyAddAssociationMixin, 
+	BelongsToManyGetAssociationsMixin, 
+	BelongsToManyRemoveAssociationMixin, 
+	BelongsToManyRemoveAssociationsMixin,
+	DataTypes, 
+	Model, 
+	NonAttribute, 
+	Sequelize 
+} from "sequelize";
 import { LocalisationPoint, PointAttributes, PointInput } from "../types/models/Point";
 import { Day } from "./Day";
 import { Step } from "./Step";
@@ -21,8 +31,11 @@ export class Point extends Model<PointAttributes, PointInput> implements PointAt
 	declare stepId?: number | undefined;
 	declare step?: NonAttribute<Step> | undefined;
 
-	declare dayId?: number | undefined;
-	declare day?: NonAttribute<Day> | undefined;
+	declare getDays: BelongsToManyGetAssociationsMixin<Day>;
+	declare addDay: BelongsToManyAddAssociationMixin<Day, number>;
+	declare getDay: BelongsToGetAssociationMixin<Day>;
+	declare removeDay: BelongsToManyRemoveAssociationMixin<Day, number>;
+	declare removeDays: BelongsToManyRemoveAssociationsMixin<Day, number>;
 }
 
 export function init(sequelize: Sequelize): void {
@@ -51,10 +64,6 @@ export function init(sequelize: Sequelize): void {
 			type: DataTypes.INTEGER,
 			allowNull: true
 		},
-		dayId: {
-			type: DataTypes.INTEGER,
-			allowNull: true
-		}
 	}, 
 	{
 		sequelize,
@@ -63,9 +72,7 @@ export function init(sequelize: Sequelize): void {
 }
 
 export function associate() {
-	Point.belongsTo(Day, {
-		foreignKey: "dayId",
-		targetKey: "id",
-		as: "day"
+	Point.belongsToMany(Day, {
+		through: "Visit"
 	});
 }
