@@ -116,8 +116,8 @@ export async function deleteStep(request: Request, response: Response) {
 	});
 
 	await step.destroy();
-
-	// update steps order
+	
+	// on update l'ordre de chaque step
 	const steps = await Step.findAll({
 		where: {
 			tripId: step.tripId
