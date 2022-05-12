@@ -59,17 +59,20 @@ export function init(sequelize: Sequelize): void {
 export function associate() {
 	Trip.belongsToMany(User, { 
 		through: "Travelers",
+		onDelete: "cascade"
 	});
 
 	Trip.hasMany(Step, {
 		sourceKey: "id",
 		foreignKey: "tripId",
-		as: "steps"
+		as: "steps",
+		onDelete: "cascade"
 	});
 
 	Trip.hasMany(Point, {
 		sourceKey: "id",
 		foreignKey: "tripId",
-		as: "points"
+		as: "points",
+		onDelete: "cascade"
 	});
 }

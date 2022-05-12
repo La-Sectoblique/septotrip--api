@@ -26,12 +26,8 @@ export async function getPointsByStep(request: Request, response: Response) {
 }
 
 export async function getPointsByDay(request: Request, response: Response) {
-	const points = await Point.findAll({
-		where: {
-			dayId: response.locals.day.id
-		}
-	});
-
+	const points = await (response.locals.day as Day).getPoints();
+	
 	response.json(points);
 }
 
@@ -43,18 +39,21 @@ export async function addPoint(request: Request, response: Response, next: NextF
 		...request.body
 	};
 
+	const daysId: number[] | undefined = input.daysId;
+
 	if(!isPointInput(input)) {
 		next({ message: "Invalid request body", code: 400, name: "InvalidBodyError" } as InvalidBodyError);
 		return;
 	}
 
-	if(input.dayId && !(await Day.findByPk(input.dayId))) {
-		next({ message: "Invalid day id", code: 400, name: "InvalidBodyError" } as InvalidBodyError);
-		return;
-	}
-
 	const point = await Point.create(input);
 
+	if(daysId && Array.isArray(daysId)) {		
+		for(const id of daysId) {
+			await point.addDay(id);
+		}
+	}
+	
 	response.json(point);
 }
 

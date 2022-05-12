@@ -10,7 +10,9 @@ app.use(cors({
 	origin: "*"
 }));
 app.use(fileUpload());
-app.use(express.json());
+app.use(express.json({
+	limit: "1000mb"
+}));
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/", router);

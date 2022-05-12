@@ -2,15 +2,7 @@ import { Request, Response } from "express";
 import { FileMetadata } from "../models/FileMetadata";
 import { Path } from "../models/Path";
 
-
-export async function getPathByStepOrigin(request: Request, response: Response) {
-
-	const path = await Path.findByPk(response.locals.step.pathId);
-
-	response.json(path);
-}
-
-export async function getPathByStepDestination(request: Request, response: Response) {
+export async function getPathByStep(request: Request, response: Response) {
 	const path = await Path.findOne({
 		where: {
 			destinationId: response.locals.step.id
