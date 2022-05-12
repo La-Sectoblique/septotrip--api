@@ -3,6 +3,7 @@ import { addPoint, getPointFiles, getPointsByTrip, removePoint, updatePoint } fr
 import MethodNotAllowed from "../../middlewares/MethodNotAllowed";
 import { LoadPoint } from "../../middlewares/loaders/PointLoader";
 import { LoadTrip } from "../../middlewares/loaders/TripLoader";
+import { getDaysByPoint, updatePointDays } from "../../controllers/Day";
 
 const router = Router();
 
@@ -16,6 +17,12 @@ router.route("/points/:pointId")
 	.all(LoadPoint)
 	.delete(removePoint)
 	.put(updatePoint)
+	.all(MethodNotAllowed);
+
+router.route("/points/:pointId/days")
+	.all(LoadPoint)
+	.get(getDaysByPoint)
+	.put(updatePointDays)
 	.all(MethodNotAllowed);
 
 router.route("/points/:pointId/files")

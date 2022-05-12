@@ -1,6 +1,7 @@
 import { 
 	BelongsToGetAssociationMixin, 
 	BelongsToManyAddAssociationMixin, 
+	BelongsToManyAddAssociationsMixin, 
 	BelongsToManyGetAssociationsMixin, 
 	BelongsToManyRemoveAssociationMixin, 
 	BelongsToManyRemoveAssociationsMixin,
@@ -33,6 +34,7 @@ export class Point extends Model<PointAttributes, PointInput> implements PointAt
 
 	declare getDays: BelongsToManyGetAssociationsMixin<Day>;
 	declare addDay: BelongsToManyAddAssociationMixin<Day, number>;
+	declare addDays: BelongsToManyAddAssociationsMixin<Day, number>;
 	declare getDay: BelongsToGetAssociationMixin<Day>;
 	declare removeDay: BelongsToManyRemoveAssociationMixin<Day, number>;
 	declare removeDays: BelongsToManyRemoveAssociationsMixin<Day, number>;
