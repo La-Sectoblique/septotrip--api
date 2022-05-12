@@ -49,9 +49,7 @@ export async function addPoint(request: Request, response: Response, next: NextF
 	const point = await Point.create(input);
 
 	if(daysId && Array.isArray(daysId)) {		
-		for(const id of daysId) {
-			await point.addDay(id);
-		}
+		await point.addDays(daysId);	
 	}
 	
 	response.json(point);
