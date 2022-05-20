@@ -7,6 +7,7 @@ import { FileMetadata } from "../models/FileMetadata";
 import { Trip } from "../models/Trip";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
 import { FileMetadataInput, isFileMetadataInput } from "../types/models/File";
+import { getBucketPrefix } from "../utils/File";
 
 
 export async function uploadFile(request: Request, response: Response, next: NextFunction) {
@@ -28,7 +29,9 @@ export async function uploadFile(request: Request, response: Response, next: Nex
 
 	const fileMetadata = await FileMetadata.create(metadata);
 
-	await FileManagement.get().uploadFile(fileMetadata, `${process.env.NODE_ENV === "production" ? "prod" : "dev"}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`, files.data);
+	const bucketPrefix = getBucketPrefix();
+
+	await FileManagement.get().uploadFile(fileMetadata, `${bucketPrefix}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`, files.data);
 
 	response.json(fileMetadata);
 }
@@ -36,8 +39,9 @@ export async function uploadFile(request: Request, response: Response, next: Nex
 export async function getFile(request: Request, response: Response) {
 	const trip: Trip = response.locals.trip;
 	const metadata = response.locals.fileMetada;
+	const bucketPrefix = getBucketPrefix();
 
-	const res = await FileManagement.get().getFile(metadata.id, `${process.env.NODE_ENV === "production" ? "prod" : "dev"}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
+	const res = await FileManagement.get().getFile(metadata.id, `${bucketPrefix}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
 
 	let fileData: Buffer;
 
@@ -82,8 +86,9 @@ export async function updateMetadata(request: Request, response: Response) {
 export async function deleteFile(request: Request, response: Response) {
 	const metadata: FileMetadata = response.locals.fileMetada;
 	const trip: Trip = response.locals.trip;
-
-	await FileManagement.get().deleteFile(metadata.id, `${process.env.NODE_ENV === "production" ? "prod" : "dev"}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
+	const bucketPrefix = getBucketPrefix();
+	
+	await FileManagement.get().deleteFile(metadata.id, `${bucketPrefix}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
 
 	await FileMetadata.destroy();
 

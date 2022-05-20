@@ -31,6 +31,7 @@ export function associate() {
 	Path.belongsTo(Step, {
 		foreignKey: "destinationId",
 		targetKey: "id",
-		as: "destination"
+		as: "destination",
+		onDelete: "cascade"
 	});
 }
