@@ -3,7 +3,7 @@ import { UserAttributes, UserInput } from "../types/models/User";
 import { Point } from "./Point";
 import { Trip } from "./Trip";
 
-export class User extends Model<UserAttributes, UserInput> implements UserAttributes {
+export class User extends Model<UserInput, UserInput> implements UserAttributes {
     declare id: number;
 	declare email: string;
 	declare firstName: string;
