@@ -16,13 +16,15 @@ if(!process.env.POSTGRES_HOST || !process.env.POSTGRES_PORT)
 if(!process.env.POSTGRES_DB) 
 	throw new Error("No database provided");
 
+const database = process.env.NODE_ENV === "test" ? `test-${process.env.POSTGRES_DB}` : process.env.POSTGRES_DB;
+
 const sequelize = new Sequelize({
 	dialect: "postgres",
 	username: process.env.POSTGRES_USER,
 	password: process.env.POSTGRES_PASSWORD,
 	host: process.env.POSTGRES_HOST,
 	port: Number.parseInt(process.env.POSTGRES_PORT),
-	database: process.env.POSTGRES_DB,
+	database,
 	logging: (msg) => Loggers.getLogger("database").debug(msg)
 });
 
@@ -36,7 +38,7 @@ export default async function() {
 		init(sequelize);
 	}
 
-	// assiocations
+	// associations
 	for(const modelFile of models) {
 		const { associate } = await import(path.join(MODEL_FOLDER, modelFile));
 		
