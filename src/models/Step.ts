@@ -56,12 +56,13 @@ export function associate() {
 	Step.hasMany(Point, {
 		sourceKey: "id",
 		foreignKey: "stepId",
-		as: "points"
+		as: "points",
 	});
 
 	Step.hasMany(Day, {
 		sourceKey: "id",
 		foreignKey: "stepId",
-		as: "days"
+		as: "days",
+		onDelete: "cascade"
 	});
 }
