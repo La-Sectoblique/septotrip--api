@@ -38,7 +38,6 @@ export async function addStep(request: Request, response: Response, next: NextFu
 
 	if(steps.length > 0) {
 		await Path.create({
-			description: "",
 			destinationId: step.id
 		});
 	}
@@ -148,7 +147,7 @@ export async function deleteStep(request: Request, response: Response) {
 	
 		if(path) continue;
 
-		await Path.create({ description: "", destinationId: s.id });
+		await Path.create({ destinationId: s.id });
 	}
 
 	response.json({ message: "Step deleted" });
@@ -205,7 +204,7 @@ export async function updateStepOrder(request: Request, response: Response) {
 	
 		if(path) continue;
 
-		await Path.create({ description: "", destinationId: s.id });
+		await Path.create({ destinationId: s.id });
 	}
 
 	response.json(steps);

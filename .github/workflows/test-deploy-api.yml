@@ -1,15 +1,15 @@
-name: Build and deploy production API
+name: Build and deploy test API
 
 on: 
   push:
-    branches: [ master ]
+    branches: [ dev ]
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ${{ github.repository }}-test
 
 jobs:
-  build-api-master: 
+  build-api-test: 
     runs-on: ubuntu-latest
 
     permissions:
@@ -29,7 +29,7 @@ jobs:
     - name: Extract metadata (tags, labels) for Docker
       id: meta
       uses: docker/metadata-action@v3
-      with:
+      with: 
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
     - name: Build and push Docker image
       uses: docker/build-push-action@v2
@@ -38,9 +38,9 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-  deploy-api-master:
+  deploy-api-test:
     runs-on: ubuntu-latest
-    needs: build-api-master
+    needs: build-api-test
 
     permissions:
       contents: read
@@ -55,7 +55,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
         script: |
-          docker-compose -f docker-compose.prod.yml pull api
-          docker-compose -f docker-compose.prod.yml stop api
-          docker-compose -f docker-compose.prod.yml rm -f api
-          docker-compose -f docker-compose.prod.yml --env-file ./.env up -d api
+          docker-compose -f docker-compose.prod.yml pull api-test
+          docker-compose -f docker-compose.prod.yml stop api-test
+          docker-compose -f docker-compose.prod.yml rm -f api-test
+          docker-compose -f docker-compose.prod.yml --env-file ./.env up -d api-test
