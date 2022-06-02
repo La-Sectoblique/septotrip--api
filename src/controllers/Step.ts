@@ -130,13 +130,6 @@ export async function deleteStep(request: Request, response: Response) {
 		await steps[i].update({ order: i + 1 });
 	}
 
-	// delete first step trip 
-	await Path.destroy({
-		where: {
-			destinationId: steps[0].id
-		}
-	});
-
 	// create all missing paths
 	for(const s of steps) {
 		const path = await Path.findOne({
@@ -186,13 +179,6 @@ export async function updateStepOrder(request: Request, response: Response) {
 	for(let i = 0; i < steps.length; i++) {
 		await steps[i].update({ order: i + 1 });
 	}
-
-	// delete first step trip 
-	await Path.destroy({
-		where: {
-			destinationId: steps[0].id
-		}
-	});
 
 	// create all missing paths
 	for(const s of steps) {
