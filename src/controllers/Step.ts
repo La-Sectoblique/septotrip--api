@@ -36,11 +36,9 @@ export async function addStep(request: Request, response: Response, next: NextFu
 		});
 	}
 
-	if(steps.length > 0) {
-		await Path.create({
-			destinationId: step.id
-		});
-	}
+	await Path.create({
+		destinationId: step.id
+	});
 
 	response.json(step);
 }
