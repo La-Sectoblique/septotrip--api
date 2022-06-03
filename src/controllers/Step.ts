@@ -31,8 +31,7 @@ export async function addStep(request: Request, response: Response, next: NextFu
 	for(let i = 0; i < step.duration; i++) {
 		await Day.create({
 			number: i + 1,
-			stepId: step.id,
-			description: ""
+			stepId: step.id
 		});
 	}
 
@@ -92,8 +91,7 @@ export async function updateStep(request: Request, response: Response) {
 			for(let i = days.length; i < newAttributes.duration; i++) {
 				await Day.create({
 					number: i + 1,
-					stepId: step.id,
-					description: ""
+					stepId: step.id
 				});
 			}
 		}
