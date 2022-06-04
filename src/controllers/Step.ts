@@ -31,8 +31,7 @@ export async function addStep(request: Request, response: Response, next: NextFu
 	for(let i = 0; i < step.duration; i++) {
 		await Day.create({
 			number: i + 1,
-			stepId: step.id,
-			description: ""
+			stepId: step.id
 		});
 	}
 
@@ -92,8 +91,7 @@ export async function updateStep(request: Request, response: Response) {
 			for(let i = days.length; i < newAttributes.duration; i++) {
 				await Day.create({
 					number: i + 1,
-					stepId: step.id,
-					description: ""
+					stepId: step.id
 				});
 			}
 		}
@@ -171,11 +169,15 @@ export async function updateStepOrder(request: Request, response: Response) {
 	});
 
 	// change order
+	// remove old step
 	steps.splice( steps.findIndex( s => s.id === step.id ), 1 );
+	// insert new step at the correct index
 	steps.splice( steps.findIndex( s => s.order === newOrder ) ?? steps.length, 0, step );
 
+	const offset: number = newOrder < step.order ? 1 : 0;
+
 	for(let i = 0; i < steps.length; i++) {
-		await steps[i].update({ order: i + 1 });
+		await steps[i].update({ order: i + offset });
 	}
 
 	// create all missing paths

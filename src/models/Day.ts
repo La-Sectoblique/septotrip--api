@@ -6,7 +6,7 @@ import { Step } from "./Step";
 export class Day extends Model<DayAttributes, DayInput> implements DayAttributes {
 	declare id: number;
 	declare number: number;
-	declare description: string;
+	declare description?: string;
 	
 	declare stepId: number;
 	declare step: NonAttribute<Step>;
@@ -30,7 +30,7 @@ export function init(sequelize: Sequelize): void {
 		},
 		description: {
 			type: DataTypes.STRING,
-			allowNull: false
+			allowNull: true
 		}
 	}, {
 		sequelize,
