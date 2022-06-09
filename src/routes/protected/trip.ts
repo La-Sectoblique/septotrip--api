@@ -33,13 +33,13 @@ router.route("/trips/:tripId/users/:userId")
 	.delete(removeMemberFromTrip)
 	.all(MethodNotAllowed);
 
-router.route("/trips/:tripId/file")
+router.route("/trips/:tripId/files")
 	.all(LoadTrip)
 	.get(getTripFiles)
 	.post(uploadFile)
 	.all(MethodNotAllowed);
 
-router.route("/trips/:tripId/file/:fileId")
+router.route("/trips/:tripId/files/:fileId")
 	.all(LoadTrip)
 	.all(LoadFileMetadata)
 	.get(getFileMetadata)

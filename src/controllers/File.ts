@@ -113,6 +113,10 @@ export async function updateMetadata(request: Request, response: Response) {
 	const metadata: FileMetadata = response.locals.fileMetadata;
 	const newAttributes: Partial<FileMetadata> = request.body;
 
+	if(newAttributes.visibility) {
+		newAttributes.tempFileId = "";
+	}
+
 	const meta = await metadata.update(newAttributes);
 
 	const tempFileId = await generateTempFileId(meta.id);
@@ -128,7 +132,7 @@ export async function deleteFile(request: Request, response: Response) {
 	const trip: Trip = response.locals.trip;
 	const bucketPrefix = getBucketPrefix();
 	
-	await FileManagement.get().deleteFile(metadata.id, `${bucketPrefix}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
+	await FileManagement.get().deleteFile(metadata.id.toString(), `${bucketPrefix}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
 
 	await FileMetadata.destroy();
 

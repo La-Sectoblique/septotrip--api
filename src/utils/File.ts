@@ -28,10 +28,12 @@ export async function generateTempFileId(fileId: string): Promise<string | undef
 
 	await file.update({ tempFileId: tempId });
 
-	setTimeout(async () => {
-		await file.update({ tempFileId: "" });
-		Loggers.getLogger("FileManager").debug("Lien temporaire supprimé");
-	}, 60 * 1000);
+	if(file.visibility !== "public") {
+		setTimeout(async () => {
+			await file.update({ tempFileId: "" });
+			Loggers.getLogger("FileManager").debug("Lien temporaire supprimé");
+		}, 60 * 1000);
+	}
 
 	return tempId;
 }
