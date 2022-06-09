@@ -29,7 +29,7 @@ export async function createTrip(request: Request, response: Response, next: Nex
 	
 	trip.addUser(user);
 
-	FileManagement.get().createBucketIfNotExist(`${process.env.NODE_ENV === "production" ? "prod" : "dev"}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
+	await FileManagement.get().createBucketIfNotExist(`${process.env.NODE_ENV === "production" ? "prod" : "dev"}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
 
 	response.json(trip);
 }
