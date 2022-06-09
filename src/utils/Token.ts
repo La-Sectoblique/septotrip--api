@@ -2,8 +2,8 @@ import { encode, decode, TAlgorithm } from "jwt-simple";
 import { PartialSession, EncodedSession, Session, DecodedSession, ExpirationStatus } from "../types/utils/Session";
 
 const ALGO: TAlgorithm = "HS512";
-const TOKEN_LIFETIME = 25 * 60 * 1000;
-const GRACE_TIME = 5 * 60 * 1000;
+const TOKEN_LIFETIME = 24 * 60 * 60 * 1000;
+const GRACE_TIME = 60 * 60 * 1000;
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
 export function encodeSession(partialSession: PartialSession): EncodedSession {

@@ -1,5 +1,5 @@
 import { S3, Credentials } from "aws-sdk";
-import { FileMetadataInput } from "../types/models/File";
+import { FileMetadata } from "../models/FileMetadata";
 import Loggers from "./Logger";
 
 export default class FileManagement {
@@ -56,10 +56,10 @@ export default class FileManagement {
 		}).promise();
 	}
 
-	public async uploadFile(metadata: FileMetadataInput, bucket: string, data: Buffer, ) {
+	public async uploadFile(metadata: FileMetadata, bucket: string, data: Buffer, ) {
 		return this.S3.upload({
 			Bucket: bucket,
-			Key: metadata.id,
+			Key: metadata.id.toString(),
 			Body: data,
 			ContentType: metadata.mimeType			
 		}).promise();

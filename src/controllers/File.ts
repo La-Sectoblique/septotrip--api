@@ -1,13 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import { Blob } from "node:buffer";
 import { Readable } from "stream";
-import { v4 } from "uuid";
 import FileManagement from "../core/FileManagement";
 import { FileMetadata } from "../models/FileMetadata";
 import { Trip } from "../models/Trip";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
 import { FileMetadataInput, isFileMetadataInput } from "../types/models/File";
-import { getBucketPrefix } from "../utils/File";
+import { generateTempFileId, getBucketPrefix } from "../utils/File";
 
 
 export async function uploadFile(request: Request, response: Response, next: NextFunction) {
@@ -18,7 +17,6 @@ export async function uploadFile(request: Request, response: Response, next: Nex
 		return next({ message: "Only one file at the time", code: 400, name: "InvalidBodyError" } as InvalidBodyError);
 
 	const metadata: FileMetadataInput = {
-		id: v4(),
 		mimeType: files.mimetype,
 		tripId: trip.id,
 		...request.body
@@ -33,15 +31,35 @@ export async function uploadFile(request: Request, response: Response, next: Nex
 
 	await FileManagement.get().uploadFile(fileMetadata, `${bucketPrefix}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`, files.data);
 
+	const tempFileId = await generateTempFileId(fileMetadata.id);
+
+	if(tempFileId)
+		fileMetadata.tempFileId = tempFileId;
+
 	response.json(fileMetadata);
 }
 
+export async function getFileMetadata(request: Request, response: Response) {
+	const metadata = response.locals.fileMetadata;
+
+	const tempFileId = await generateTempFileId(metadata.id);
+
+	if(tempFileId)
+		metadata.tempFileId = tempFileId;
+
+	response.json(metadata);
+}
+
 export async function getFile(request: Request, response: Response) {
-	const trip: Trip = response.locals.trip;
-	const metadata = response.locals.fileMetada;
+	const metadata: FileMetadata = response.locals.fileMetadata;
+	const trip = await Trip.findByPk(metadata.tripId);
+
+	if(!trip)
+		throw new Error("Wtf y'a po de trip");
+
 	const bucketPrefix = getBucketPrefix();
 
-	const res = await FileManagement.get().getFile(metadata.id, `${bucketPrefix}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
+	const res = await FileManagement.get().getFile(metadata.id.toString(), `${bucketPrefix}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
 
 	let fileData: Buffer;
 
@@ -74,11 +92,33 @@ export async function getFile(request: Request, response: Response) {
 	response.status(200).send(fileData);
 }
 
+export async function getTripFiles(request: Request, response: Response) {
+	const metadatas = await FileMetadata.findAll({
+		where: {
+			tripId: response.locals.trip.id
+		}
+	});
+
+	for(let i = 0; i < metadatas.length; i++) {
+		const tempFileId = await generateTempFileId(metadatas[i].id);
+
+		if(tempFileId)
+			metadatas[i].tempFileId = tempFileId;	
+	}
+
+	response.json(metadatas);
+}
+
 export async function updateMetadata(request: Request, response: Response) {
 	const metadata: FileMetadata = response.locals.fileMetadata;
 	const newAttributes: Partial<FileMetadata> = request.body;
 
 	const meta = await metadata.update(newAttributes);
+
+	const tempFileId = await generateTempFileId(meta.id);
+
+	if(tempFileId)
+		meta.tempFileId = tempFileId;
 
 	response.json(meta);
 }

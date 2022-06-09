@@ -13,6 +13,7 @@ export class FileMetadata extends Model<FileMetadataAttributes, FileMetadataInpu
 	declare extension: string;
 	declare mimeType: string;
 	declare visibility: Visibility;
+	declare tempFileId?: string;
 
 	declare tripId: number;
 	declare pointId?: number | undefined;
@@ -22,11 +23,6 @@ export class FileMetadata extends Model<FileMetadataAttributes, FileMetadataInpu
 
 export function init(sequelize: Sequelize) {
 	FileMetadata.init({
-		id: {
-			type: DataTypes.STRING,
-			allowNull: false,
-			primaryKey: true
-		},
 		name: {
 			type: DataTypes.STRING,
 			allowNull: false
@@ -38,6 +34,10 @@ export function init(sequelize: Sequelize) {
 		mimeType: {
 			type: DataTypes.STRING,
 			allowNull: false
+		},
+		tempFileId: {
+			type: DataTypes.STRING,
+			allowNull: true
 		},
 		visibility: {
 			type: DataTypes.STRING,
