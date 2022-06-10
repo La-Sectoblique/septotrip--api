@@ -6,6 +6,7 @@ import { FileMetadata } from "../models/FileMetadata";
 import { Trip } from "../models/Trip";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
 import { FileMetadataInput, isFileMetadataInput } from "../types/models/File";
+import { GenericObjectWithStrings } from "../types/utils/Object";
 import { generateTempFileId, getBucketPrefix } from "../utils/File";
 
 
@@ -94,10 +95,22 @@ export async function getFile(request: Request, response: Response) {
 }
 
 export async function getTripFiles(request: Request, response: Response) {
+
+	const whereQueryObject: GenericObjectWithStrings = {
+		tripId: response.locals.trip.id
+	};
+
+	if(request.query.type) 
+		whereQueryObject.fileType = request.query.type as string;
+	if(request.query.step) 
+		whereQueryObject.stepId = request.query.step as string;
+	if(request.query.path) 
+		whereQueryObject.pathId = request.query.path as string;
+	if(request.query.point) 
+		whereQueryObject.pointId = request.query.point as string;
+
 	const metadatas = await FileMetadata.findAll({
-		where: {
-			tripId: response.locals.trip.id
-		}
+		where: whereQueryObject
 	});
 
 	for(let i = 0; i < metadatas.length; i++) {

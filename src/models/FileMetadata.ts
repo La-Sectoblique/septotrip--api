@@ -1,5 +1,6 @@
 import { Model, Sequelize, DataTypes } from "sequelize";
-import { FileMetadataAttributes, FileMetadataInput } from "../types/models/File";
+import { FileMetadataAttributes, FileMetadataInput, FileType } from "../types/models/File";
+import { getEnumValues } from "../types/utils/Enum";
 import { Visibility } from "../types/utils/Visibility";
 import { Path } from "./Path";
 import { Point } from "./Point";
@@ -12,6 +13,7 @@ export class FileMetadata extends Model<FileMetadataAttributes, FileMetadataInpu
 	declare name: string;
 	declare extension: string;
 	declare mimeType: string;
+	declare fileType: FileType;
 	declare visibility: Visibility;
 	declare tempFileId?: string;
 
@@ -34,6 +36,11 @@ export function init(sequelize: Sequelize) {
 		mimeType: {
 			type: DataTypes.STRING,
 			allowNull: false
+		},
+		fileType: {
+			type: DataTypes.STRING,
+			allowNull: false,
+			values: getEnumValues(FileType)
 		},
 		tempFileId: {
 			type: DataTypes.STRING,
