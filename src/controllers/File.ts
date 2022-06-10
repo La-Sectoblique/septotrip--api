@@ -11,14 +11,15 @@ import { generateTempFileId, getBucketPrefix } from "../utils/File";
 
 export async function uploadFile(request: Request, response: Response, next: NextFunction) {
 	const trip: Trip = response.locals.trip;
-	const files = request.files?.file;
+	const file = request.files?.file;
 
-	if(Array.isArray(files) || files === undefined)
+	if(Array.isArray(file) || file === undefined)
 		return next({ message: "Only one file at the time", code: 400, name: "InvalidBodyError" } as InvalidBodyError);
 
 	const metadata: FileMetadataInput = {
-		mimeType: files.mimetype,
+		mimeType: file.mimetype,
 		tripId: trip.id,
+		tempFileId: "",
 		...request.body
 	};
 	
@@ -29,7 +30,7 @@ export async function uploadFile(request: Request, response: Response, next: Nex
 
 	const bucketPrefix = getBucketPrefix();
 
-	await FileManagement.get().uploadFile(fileMetadata, `${bucketPrefix}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`, files.data);
+	await FileManagement.get().uploadFile(fileMetadata, `${bucketPrefix}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`, file.data);
 
 	const tempFileId = await generateTempFileId(fileMetadata.id);
 
