@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { FileMetadata } from "../../models/FileMetadata";
+import { Travelers } from "../../models/Travelers";
 import InexistantResourceError from "../../types/errors/InexistantResourceError";
 import NoIdProvidedError from "../../types/errors/NoIdProvidedError";
+import UnauthorizedError from "../../types/errors/UnauthorizedError";
 
 
 export async function LoadFileMetadata(request: Request, response: Response, next: NextFunction) {
@@ -30,6 +32,22 @@ export async function LoadFileMetadata(request: Request, response: Response, nex
 	if(!fileMetadata) {
 		next({ message: "No fileMetada found", code: 404, name: "InexistantResourceError" } as InexistantResourceError);
 		return;
+	}
+
+	if(fileMetadata.visibility !== "public") {
+
+		// user verification
+		const result = await Travelers.findOne({
+			where: {
+				TripId: fileMetadata.tripId,
+				UserId: response.locals.user.id
+			}
+		});
+	
+		if(!result) {
+			next({ message: "You are not part of this trip", code: 403, name: "UnauthorizedError" } as UnauthorizedError);
+			return;
+		}
 	}
 
 	response.locals.fileMetadata = fileMetadata;

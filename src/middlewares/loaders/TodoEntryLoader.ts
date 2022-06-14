@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { TodoEntry } from "../../models/TodoEntry";
+import { Travelers } from "../../models/Travelers";
 import InexistantResourceError from "../../types/errors/InexistantResourceError";
 import NoIdProvidedError from "../../types/errors/NoIdProvidedError";
+import UnauthorizedError from "../../types/errors/UnauthorizedError";
 
 
 export async function LoadTodoEntry(request: Request, response: Response, next: NextFunction) {
@@ -17,6 +19,19 @@ export async function LoadTodoEntry(request: Request, response: Response, next: 
 
 	if(!todoEntry) {
 		next({ message: "No todoEntry found", code: 404, name: "InexistantResourceError" } as InexistantResourceError);
+		return;
+	}
+
+	// user verification
+	const result = await Travelers.findOne({
+		where: {
+			TripId: todoEntry.tripId,
+			UserId: response.locals.user.id
+		}
+	});
+
+	if(!result) {
+		next({ message: "You are not part of this trip", code: 403, name: "UnauthorizedError" } as UnauthorizedError);
 		return;
 	}
 
