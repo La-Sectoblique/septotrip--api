@@ -34,7 +34,7 @@ export async function getPointsByDay(request: Request, response: Response) {
 export async function addPoint(request: Request, response: Response, next: NextFunction) {
 
 	const input = {
-		authorId: response.locals.session.id,
+		authorId: response.locals.user.id,
 		tripId: response.locals.trip.id,
 		...request.body
 	};
