@@ -5,6 +5,7 @@ import { Path } from "../models/Path";
 import { Step } from "../models/Step";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
 import { isStepInput, StepOutput } from "../types/models/Step";
+import { moveItemInArray } from "../utils/Array";
 
 
 export async function addStep(request: Request, response: Response, next: NextFunction) {
@@ -17,7 +18,7 @@ export async function addStep(request: Request, response: Response, next: NextFu
 
 	const input = {
 		tripId: response.locals.trip.id,
-		order: steps.length + 1,
+		order: steps.length,
 		...request.body
 	};
 
@@ -123,7 +124,7 @@ export async function deleteStep(request: Request, response: Response) {
 	});
 
 	for(let i = 0; i < await steps.length; i++) {
-		await steps[i].update({ order: i + 1 });
+		await steps[i].update({ order: i });
 	}
 
 	// create all missing paths
@@ -169,16 +170,11 @@ export async function updateStepOrder(request: Request, response: Response) {
 	});
 
 	// change order
-	// remove old step
-	steps.splice( steps.findIndex( s => s.id === step.id ), 1 );
-	// insert new step at the correct index
-	steps.splice( steps.findIndex( s => s.order === newOrder ) ?? steps.length + 1, 0, step );
-
-	const offset: number = newOrder < step.order ? 1 : 0;
-
-	for(let i = 0; i < steps.length; i++) {
-		await steps[i].update({ order: i + offset });
-	}
+	moveItemInArray(
+		steps, 
+		steps.findIndex( s => s.id === step.id ),
+		newOrder
+	);
 
 	// create all missing paths
 	for(const s of steps) {
