@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { Spent } from "../../models/Spent";
+import { Travelers } from "../../models/Travelers";
 import InexistantResourceError from "../../types/errors/InexistantResourceError";
 import NoIdProvidedError from "../../types/errors/NoIdProvidedError";
+import UnauthorizedError from "../../types/errors/UnauthorizedError";
 
 
 export async function LoadSpent(request: Request, response: Response, next: NextFunction) {
@@ -17,6 +19,19 @@ export async function LoadSpent(request: Request, response: Response, next: Next
 
 	if(!spent) {
 		next({ message: "No spent found", code: 404, name: "InexistantResourceError" } as InexistantResourceError);
+		return;
+	}
+
+	// user verification
+	const result = await Travelers.findOne({
+		where: {
+			TripId: spent.tripId,
+			UserId: response.locals.user.id
+		}
+	});
+
+	if(!result) {
+		next({ message: "You are not part of this trip", code: 403, name: "UnauthorizedError" } as UnauthorizedError);
 		return;
 	}
 

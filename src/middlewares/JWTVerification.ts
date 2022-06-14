@@ -49,14 +49,17 @@ export async function JWTVerification(request: Request, response: Response, next
 		session = decodedSession.session;
 	}
 
-	if(!(await User.findByPk(session.id))) {
+	const user = await User.findByPk(session.id);
+
+	if(!user) {
 		next({ code: 401, message: "No user with this token", name: "InvalidTokenError" } as InvalidTokenError);
 		return;
 	}
 
 	response.locals = {
 		...response.locals,
-		session
+		session,
+		user
 	};
 
 	next();

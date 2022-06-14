@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { Day } from "../../models/Day";
+import { Step } from "../../models/Step";
+import { Travelers } from "../../models/Travelers";
 import InexistantResourceError from "../../types/errors/InexistantResourceError";
 import NoIdProvidedError from "../../types/errors/NoIdProvidedError";
+import UnauthorizedError from "../../types/errors/UnauthorizedError";
 
 
 export async function LoadDay(request: Request, response: Response, next: NextFunction) {
@@ -20,6 +23,24 @@ export async function LoadDay(request: Request, response: Response, next: NextFu
 		return;
 	}
 
+	// user verification
+	const step = await Step.findByPk(day.stepId);
+
+	if(!step)
+		throw new Error("?");
+
+	const result = await Travelers.findOne({
+		where: {
+			TripId: step.tripId,
+			UserId: response.locals.user.id
+		}
+	});
+
+	if(!result) {
+		next({ message: "You are not part of this trip", code: 403, name: "UnauthorizedError" } as UnauthorizedError);
+		return;
+	}
+	
 	response.locals.day = day;
 
 	next();

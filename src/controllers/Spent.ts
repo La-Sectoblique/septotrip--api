@@ -5,7 +5,7 @@ import { isSpentInput, SpentInput } from "../types/models/Spent";
 
 export async function newSpent(request: Request, response: Response, next: NextFunction) {
 	const input: SpentInput = {
-		authorId: response.locals.session.id,
+		authorId: response.locals.user.id,
 		tripId: response.locals.trip.id,
 		...request.body
 	};

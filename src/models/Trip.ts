@@ -59,6 +59,7 @@ export function init(sequelize: Sequelize): void {
 export function associate() {
 	Trip.belongsToMany(User, { 
 		through: "Travelers",
+		foreignKey: "TripId",
 		onDelete: "cascade"
 	});
 

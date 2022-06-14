@@ -172,7 +172,7 @@ export async function updateStepOrder(request: Request, response: Response) {
 	// remove old step
 	steps.splice( steps.findIndex( s => s.id === step.id ), 1 );
 	// insert new step at the correct index
-	steps.splice( steps.findIndex( s => s.order === newOrder ) ?? steps.length, 0, step );
+	steps.splice( steps.findIndex( s => s.order === newOrder ) ?? steps.length + 1, 0, step );
 
 	const offset: number = newOrder < step.order ? 1 : 0;
 

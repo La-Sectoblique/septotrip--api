@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { Trip } from "../../models/Trip";
 import InexistantResourceError from "../../types/errors/InexistantResourceError";
 import NoIdProvidedError from "../../types/errors/NoIdProvidedError";
+import UnauthorizedError from "../../types/errors/UnauthorizedError";
 
 
 export async function LoadTrip(request: Request, response: Response, next: NextFunction) {
@@ -17,6 +18,14 @@ export async function LoadTrip(request: Request, response: Response, next: NextF
 
 	if(!trip) {
 		next({ message: "No trip found", code: 404, name: "InexistantResourceError" } as InexistantResourceError);
+		return;
+	}
+
+	// user verification
+	const userTrips = await response.locals.user.getTrips();
+
+	if(!userTrips.map( (trip: Trip) => trip.id).includes(tripId)) {
+		next({ message: "You are not part of this trip", code: 403, name: "UnauthorizedError" } as UnauthorizedError);
 		return;
 	}
 

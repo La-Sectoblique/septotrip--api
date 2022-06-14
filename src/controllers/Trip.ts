@@ -5,7 +5,6 @@ import { User } from "../models/User";
 import InexistantResourceError from "../types/errors/InexistantResourceError";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
 import NoIdProvidedError from "../types/errors/NoIdProvidedError";
-import UnauthorizedError from "../types/errors/UnauthorizedError";
 import { isTripInput } from "../types/models/Trip";
 import { UserAttributes } from "../types/models/User";
 import { isVisibility } from "../types/utils/Visibility";
@@ -13,7 +12,7 @@ import { isVisibility } from "../types/utils/Visibility";
 export async function createTrip(request: Request, response: Response, next: NextFunction) {
 
 	const input = {
-		authorId: response.locals.session.id,
+		authorId: response.locals.user.id,
 		...request.body
 	};
 
@@ -46,12 +45,7 @@ export async function getAllPublicTrips(request: Request, response: Response) {
 
 export async function getUserTrips(request: Request, response: Response) {
 
-	const user = await User.findByPk(response.locals.session.id);
-
-	if(!user)
-		throw new Error("?");
-
-	const trips = await user.getTrips();
+	const trips = await response.locals.user.getTrips();
 
 	response.json(trips);
 }
@@ -75,16 +69,9 @@ export async function updateTrip(request: Request, response: Response, next: Nex
 	response.json(trip);
 }
 
-export async function deleteTrip(request: Request, response: Response, next: NextFunction) {
+export async function deleteTrip(request: Request, response: Response) {
 	const trip: Trip = response.locals.trip;
 
-	const userId = response.locals.session.id;
-
-	if(userId !== trip.authorId) {
-		next({ code: 403, message: "Missing permission", name: "UnauthorizedError" } as UnauthorizedError);
-		return;
-	}
-	
 	await trip.destroy();
 
 	response.json({ message: "Trip deleted" });
@@ -101,13 +88,6 @@ export async function getTripUsers(request: Request, response: Response) {
 export async function addingMemberToTrip(request: Request, response: Response, next: NextFunction) {
 
 	const trip: Trip = response.locals.trip;
-
-	const travelers: User[] = await trip.getUsers();
-
-	if(!travelers.find(usr => usr.id === response.locals.session.id)) {
-		next({ message: "No permissions for this", code: 403, name: "UnauthorizedError"} as UnauthorizedError);
-		return;
-	}
 
 	const arg: Partial<UserAttributes> = request.body;
 
@@ -135,13 +115,6 @@ export async function addingMemberToTrip(request: Request, response: Response, n
 export async function removeMemberFromTrip(request: Request, response: Response, next: NextFunction) {
 
 	const trip: Trip = response.locals.trip;
-
-	const travelers: User[] = await trip.getUsers();
-
-	if(!travelers.find(usr => usr.id === response.locals.session.id)) {
-		next({ message: "No permissions for this", code: 403, name: "UnauthorizedError"} as UnauthorizedError);
-		return;
-	}
 
 	const userId = request.params?.userId;
 

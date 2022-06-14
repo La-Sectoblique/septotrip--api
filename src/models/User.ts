@@ -14,7 +14,6 @@ export class User extends Model<UserInput, UserInput> implements UserAttributes 
 	declare getPoints: HasManyGetAssociationsMixin<Point>;
 	declare getTrips: BelongsToManyGetAssociationsMixin<Trip>;
 
-
 	declare points: NonAttribute<Point[]>
 	declare tripsCreated: NonAttribute<Trip[]>
 }
@@ -59,6 +58,7 @@ export function associate(): void {
 	});
 
 	User.belongsToMany(Trip, {
-		through: "Travelers"
+		through: "Travelers",
+		foreignKey: "UserId"
 	});
 }
