@@ -34,7 +34,7 @@ export async function LoadFileMetadata(request: Request, response: Response, nex
 		return;
 	}
 
-	if(fileMetadata.visibility !== "public") {
+	if(fileMetadata.visibility !== "public" && response.locals.user) {
 
 		// user verification
 		const result = await Travelers.findOne({
