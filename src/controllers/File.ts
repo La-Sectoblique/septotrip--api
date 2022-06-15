@@ -1,5 +1,8 @@
+import { AWSError, S3 } from "aws-sdk";
+import { PromiseResult } from "aws-sdk/lib/request";
 import { NextFunction, Request, Response } from "express";
 import { Blob } from "node:buffer";
+import { ValidationError } from "sequelize";
 import { Readable } from "stream";
 import FileManagement from "../core/FileManagement";
 import { FileMetadata } from "../models/FileMetadata";
@@ -26,12 +29,27 @@ export async function uploadFile(request: Request, response: Response, next: Nex
 	
 	if(!isFileMetadataInput(metadata))
 		return next({ message: "Invalid body error", code: 400, name: "InvalidBodyError" } as InvalidBodyError);
+	
+	let fileMetadata;
 
-	const fileMetadata = await FileMetadata.create(metadata);
+	try {
+		fileMetadata = await FileMetadata.create(metadata);
+	}
+	catch(error) {
+		if(error instanceof ValidationError)
+			return next({ message: error.message, code: 400, name: "InvalidBodyError" } as InvalidBodyError);
+		
+		return next(error);
+	}
 
 	const bucketPrefix = getBucketPrefix();
 
-	await FileManagement.get().uploadFile(fileMetadata, `${bucketPrefix}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`, file.data);
+	try {
+		await FileManagement.get().uploadFile(fileMetadata, `${bucketPrefix}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`, file.data);
+	}
+	catch(error) {
+		return next(error);
+	}
 
 	const tempFileId = await generateTempFileId(fileMetadata.id);
 
@@ -52,7 +70,7 @@ export async function getFileMetadata(request: Request, response: Response) {
 	response.json(metadata);
 }
 
-export async function getFile(request: Request, response: Response) {
+export async function getFile(request: Request, response: Response, next: NextFunction) {
 	const metadata: FileMetadata = response.locals.fileMetadata;
 	const trip = await Trip.findByPk(metadata.tripId);
 
@@ -61,7 +79,13 @@ export async function getFile(request: Request, response: Response) {
 
 	const bucketPrefix = getBucketPrefix();
 
-	const res = await FileManagement.get().getFile(metadata.id.toString(), `${bucketPrefix}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
+	let res: PromiseResult<S3.GetObjectOutput, AWSError>;
+	try {
+		res = await FileManagement.get().getFile(metadata.id.toString(), `${bucketPrefix}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
+	}
+	catch(error) {
+		return next(error);
+	}
 
 	let fileData: Buffer;
 
@@ -123,7 +147,7 @@ export async function getTripFiles(request: Request, response: Response) {
 	response.json(metadatas);
 }
 
-export async function updateMetadata(request: Request, response: Response) {
+export async function updateMetadata(request: Request, response: Response, next: NextFunction) {
 	const metadata: FileMetadata = response.locals.fileMetadata;
 	const newAttributes: Partial<FileMetadata> = request.body;
 
@@ -131,7 +155,16 @@ export async function updateMetadata(request: Request, response: Response) {
 		newAttributes.tempFileId = "";
 	}
 
-	const meta = await metadata.update(newAttributes);
+	let meta;
+	try {
+		meta = await metadata.update(newAttributes);
+	}
+	catch(error) {
+		if(error instanceof ValidationError)
+			return next({ message: error.message, code: 400, name: "InvalidBodyError" } as InvalidBodyError);
+		
+		return next(error);
+	}
 
 	const tempFileId = await generateTempFileId(meta.id);
 
@@ -148,7 +181,7 @@ export async function deleteFile(request: Request, response: Response) {
 	
 	await FileManagement.get().deleteFile(metadata.id.toString(), `${bucketPrefix}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
 
-	await FileMetadata.destroy();
+	await metadata.destroy();
 
 	response.json({ message: "File deleted" });
 }

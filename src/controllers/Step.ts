@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
+import { ValidationError } from "sequelize/dist";
 import { Day } from "../models/Day";
 import { FileMetadata } from "../models/FileMetadata";
 import { Path } from "../models/Path";
 import { Step } from "../models/Step";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
-import { isStepInput, StepOutput } from "../types/models/Step";
+import { isStepInput } from "../types/models/Step";
 import { moveItemInArray } from "../utils/Array";
 
 
@@ -27,7 +28,17 @@ export async function addStep(request: Request, response: Response, next: NextFu
 		return;
 	}
 
-	const step: StepOutput = await Step.create(input);
+	let step;
+
+	try {
+		step = await Step.create(input);
+	}
+	catch(error) {
+		if(error instanceof ValidationError)
+			return next({ message: error.message, code: 400, name: "InvalidBodyError" } as InvalidBodyError);
+
+		return next(error);
+	}
 
 	for(let i = 0; i < step.duration; i++) {
 		await Day.create({
@@ -36,9 +47,14 @@ export async function addStep(request: Request, response: Response, next: NextFu
 		});
 	}
 
-	await Path.create({
-		destinationId: step.id
-	});
+	try {
+		await Path.create({
+			destinationId: step.id
+		});
+	}
+	catch(error) {
+		return next(error);
+	}
 
 	response.json(step);
 }
@@ -65,14 +81,23 @@ export async function getStepDays(request: Request, response: Response) {
 	response.json(await response.locals.step.getDays());
 }
 
-export async function updateStep(request: Request, response: Response) {
+export async function updateStep(request: Request, response: Response, next: NextFunction) {
 	let step: Step = response.locals.step;
 	const newAttributes: Partial<Step> = request.body;
 
 	// we avoid making the "order" property modifiable by hand
 	newAttributes.order = step.order;
 
-	step = await step.update(newAttributes);
+	try {
+		step = await step.update(newAttributes);
+	}
+	catch(error) {
+		if(error instanceof ValidationError)
+			return next({ message: error.message, code: 400, name: "InvalidBodyError" } as InvalidBodyError);
+
+		return next(error);
+	}
+
 
 	// if we add or remove some days
 	if(newAttributes.duration) {

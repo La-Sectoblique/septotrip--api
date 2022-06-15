@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { ValidationError } from "sequelize";
 import { Day } from "../models/Day";
 import { FileMetadata } from "../models/FileMetadata";
 import { Point } from "../models/Point";
@@ -46,7 +47,17 @@ export async function addPoint(request: Request, response: Response, next: NextF
 		return;
 	}
 
-	const point = await Point.create(input);
+	let point;
+
+	try {
+		point = await Point.create(input);
+	}
+	catch(error) {
+		if(error instanceof ValidationError)
+			return next({ message: error.message, code: 400, name: "InvalidBodyError" } as InvalidBodyError);
+		
+		return next(error);
+	}
 
 	if(daysId && Array.isArray(daysId)) {		
 		await point.addDays(daysId);	
@@ -64,12 +75,20 @@ export async function removePoint(request: Request, response: Response) {
 	response.json({ message: "Point deleted" });
 }
 
-export async function updatePoint(request: Request, response: Response) {
+export async function updatePoint(request: Request, response: Response, next: NextFunction) {
 	
 	const point: Point = response.locals.point;
 	const newAttributes: Partial<Point> = request.body;
 
-	await point.update(newAttributes);
+	try {
+		await point.update(newAttributes);
+	}
+	catch(error) {
+		if(error instanceof ValidationError)
+			return next({ message: error.message, code: 400, name: "InvalidBodyError" } as InvalidBodyError);
+		
+		return next(error);
+	}
 
 	return response.json(point);
 }

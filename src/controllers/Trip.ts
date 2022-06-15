@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { ValidationError } from "sequelize";
 import FileManagement from "../core/FileManagement";
 import { Trip } from "../models/Trip";
 import { User } from "../models/User";
@@ -21,14 +22,29 @@ export async function createTrip(request: Request, response: Response, next: Nex
 		return;
 	}
 
-	const trip = await Trip.create(input);
+	let trip;
+	try {
+		trip = await Trip.create(input);
+	}
+	catch(error) {
+		if(error instanceof ValidationError)
+			return next({ message: error.message, code: 400, name: "InvalidBodyError" } as InvalidBodyError);
+
+		return next(error);
+	}
+
 	const user = await User.findByPk(trip.authorId);
 
 	if(!user) throw new Error("No user wtf");
 	
 	trip.addUser(user);
 
-	await FileManagement.get().createBucketIfNotExist(`${process.env.NODE_ENV === "production" ? "prod" : "dev"}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
+	try {
+		await FileManagement.get().createBucketIfNotExist(`${process.env.NODE_ENV === "production" ? "prod" : "dev"}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
+	}
+	catch(error) {
+		return next(error);
+	}
 
 	response.json(trip);
 }
@@ -64,7 +80,15 @@ export async function updateTrip(request: Request, response: Response, next: Nex
 		return;
 	}
 
-	await trip.update(newAttributes);
+	try {
+		await trip.update(newAttributes);
+	}
+	catch(error) {
+		if(error instanceof ValidationError)
+			return next({ message: error.message, code: 400, name: "InvalidBodyError" } as InvalidBodyError);
+
+		return next(error);
+	}
 
 	response.json(trip);
 }

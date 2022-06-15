@@ -1,6 +1,8 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
+import { ValidationError } from "sequelize/dist";
 import { FileMetadata } from "../models/FileMetadata";
 import { Path } from "../models/Path";
+import InvalidBodyError from "../types/errors/InvalidBodyError";
 
 export async function getPathByStep(request: Request, response: Response) {
 	const path = await Path.findOne({
@@ -12,12 +14,20 @@ export async function getPathByStep(request: Request, response: Response) {
 	response.json(path);
 }
 
-export async function updatePath(request: Request, response: Response) {
+export async function updatePath(request: Request, response: Response, next: NextFunction) {
 
 	const path = response.locals.path;
 	const newAttributes: Partial<Path> = request.body;
 
-	await path.update(newAttributes);
+	try {
+		await path.update(newAttributes);
+	}
+	catch(error) {
+		if(error instanceof ValidationError)
+			return next({ message: error.message, code: 400, name: "InvalidBodyError" } as InvalidBodyError);
+		
+		return next(error);
+	}
 
 	response.json(path);
 }
