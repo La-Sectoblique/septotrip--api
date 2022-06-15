@@ -27,15 +27,24 @@ export function init(sequelize: Sequelize) {
 	FileMetadata.init({
 		name: {
 			type: DataTypes.STRING,
-			allowNull: false
+			allowNull: false,
+			validate: {
+				len: [ 0, 255 ]
+			},
 		},
 		extension: {
 			type: DataTypes.STRING,
-			allowNull: false
+			allowNull: false,
+			validate: {
+				len: [ 0, 32 ]
+			}
 		},
 		mimeType: {
 			type: DataTypes.STRING,
-			allowNull: false
+			allowNull: false,
+			validate: {
+				len: [ 0, 255 ]
+			},
 		},
 		fileType: {
 			type: DataTypes.STRING,

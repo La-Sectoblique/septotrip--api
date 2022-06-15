@@ -14,7 +14,10 @@ export function init(sequelize: Sequelize): void {
 	LogbookEntry.init({
 		title: {
 			type: DataTypes.STRING,
-			allowNull: false
+			allowNull: false,
+			validate: {
+				len: [ 0, 233 ]
+			}
 		},
 		text: {
 			type: DataTypes.TEXT,

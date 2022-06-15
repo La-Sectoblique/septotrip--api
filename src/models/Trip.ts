@@ -31,7 +31,10 @@ export function init(sequelize: Sequelize): void {
 	Trip.init({
 		name: {
 			type: DataTypes.STRING,
-			allowNull: false
+			allowNull: false,
+			validate: {
+				len: [ 0, 255 ]
+			},
 		},
 		visibility: {
 			type: DataTypes.STRING,

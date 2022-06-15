@@ -16,7 +16,7 @@ app.use(fileUpload({
 	}
 }));
 app.use(express.json({
-	limit: "10mb"
+	limit: "1mb"
 }));
 app.use(express.urlencoded({ extended: false }));
 
