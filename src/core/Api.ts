@@ -9,9 +9,14 @@ app.use(cors({
 	exposedHeaders: ["X-Renewed-JWT-Token"],
 	origin: "*"
 }));
-app.use(fileUpload());
+app.use(fileUpload({
+	limits: {
+		fileSize: 10 * 1024 * 1024,
+		files: 1,
+	}
+}));
 app.use(express.json({
-	limit: "1000mb"
+	limit: "10mb"
 }));
 app.use(express.urlencoded({ extended: false }));
 
