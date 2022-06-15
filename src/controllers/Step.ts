@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ValidationError } from "sequelize/dist";
+import { ValidationError } from "sequelize";
 import { Day } from "../models/Day";
 import { FileMetadata } from "../models/FileMetadata";
 import { Path } from "../models/Path";

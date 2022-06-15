@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ValidationError } from "sequelize/dist";
+import { ValidationError } from "sequelize";
 import { FileMetadata } from "../models/FileMetadata";
 import { Path } from "../models/Path";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
