@@ -1,39 +1,229 @@
 import "dotenv/config";
-import { server } from "../src/core/Api";
+import { faker } from "@faker-js/faker";
 import Database from "../src/core/Database";
-import request from "supertest";
+import { getMockReq, getMockRes } from "@jest-mock/express";
+import { login, register, me } from "../src/controllers/User";
+import { Sequelize } from "sequelize";
+import { User } from "../src/models/User";
 
-describe("User endpoints", () => {
+let sequelize: Sequelize;
 
-	jest.setTimeout(40 * 1000);
+const email = faker.internet.email();
+const password = faker.internet.password();
+const firstName = faker.name.firstName();
+const lastName = faker.name.lastName();
 
-	const validEmail = "test@septotrip.com";
-	// const invalidEmail = "test";
-	
-	const validName = "Maurice";
-	// const invalidName = "Maurice".repeat(100);
+beforeAll(async () => {
+	sequelize = await Database();
+});
 
-	const validPassword = "password";
+describe("Account management", () => {
+	const { res, next, mockClear } = getMockRes();
 
-	beforeAll(async () => {
-		await Database();
+	beforeEach(() => mockClear());
+
+	it("should create an user", async () => {
+
+		// Arrange
+		const req = getMockReq({
+			body: {
+				email,
+				password,
+				firstName,
+				lastName
+			}
+		});
+
+		// Act
+		await register(req, res, next);
+
+		// Assert
+		expect(res.json).toHaveBeenCalledWith(
+			expect.objectContaining({
+				message: "User created ! Please log in"
+			})
+		);
 	});
 
-	it("should create a new user", async () => {
+	it("should return an 400 error for user creation", async () => {
+		// Arrange
+		const req = getMockReq({
+			body: {
+				thing: faker.datatype.string(64)
+			}
+		});
 
-		const res = await request(server)
-			.post("/register")
-			.send({
-				email: validEmail,
-				password: validPassword,
-				firstName: validName,
-				lastName: validName
-			});
-		
-		expect(res.statusCode).toEqual(200);	
+		// Act
+		await register(req, res, next);
+
+		// Assert
+		expect(next).toHaveBeenCalledWith(
+			expect.objectContaining({
+				message: "Invalid request body",
+				code: 400,
+				name: "InvalidBodyError"
+			})
+		);
+	});
+
+	it("should return an 409 error for user creation", async () => {
+		// Arrange
+		const req = getMockReq({
+			body: {
+				email,
+				password,
+				firstName,
+				lastName
+			}
+		});
+
+		// Act
+		await register(req, res, next);
+
+		// Assert
+		expect(next).toHaveBeenCalledWith(
+			expect.objectContaining({
+				message: "User already exist", 
+				code: 409, 
+				name: "RessourceAlreadyExistError"
+			})
+		);
+	});
+
+	it("should login", async () => {
+		// Arrange
+		const req = getMockReq({
+			body: {
+				email,
+				password
+			}
+		});
+
+		// Act
+		await login(req, res, next);
+
+		// Assert
+		expect(res.json).toHaveBeenCalledWith(
+			expect.objectContaining({
+				message: "Logged in", 
+				session: expect.objectContaining({
+					token: expect.any(String),
+					expires: expect.any(Number),
+					issued: expect.any(Number) 
+				}),
+				email
+			})
+		);
+	});
+
+	it("should return an 400 error for user login", async () => {
+		// Arrange
+		const req = getMockReq({
+			body: {
+				foo: "bar"
+			}
+		});
+
+		// Act
+		await login(req, res, next);
+
+		// Assert
+		expect(next).toHaveBeenCalledWith(
+			expect.objectContaining({
+				message: "Invalid request body", 
+				code: 400, 
+				name: "InvalidBodyError"
+			})
+		);
+	});
+
+	it("should return an 404 error for user login (wrong email)", async () => {
+		// Arrange
+		const req = getMockReq({
+			body: {
+				email: faker.internet.email(),
+				password: faker.internet.password()
+			}
+		});
+
+		// Act
+		await login(req, res, next);
+
+		// Assert
+		expect(next).toHaveBeenCalledWith(
+			expect.objectContaining({
+				message: "Inexistant user", 
+				code: 404, 
+				name: "InexistantResourceError"
+			})
+		);
+	});
+
+	it("should return an 400 error for user login (wrong password)", async () => {
+		// Arrange
+		const req = getMockReq({
+			body: {
+				email,
+				password: faker.internet.password()
+			}
+		});
+
+		// Act
+		await login(req, res, next);
+
+		// Assert
+		expect(next).toHaveBeenCalledWith(
+			expect.objectContaining({
+				code: 400, 
+				message: "Invalid password", 
+				name: "InvalidPasswordError"
+			})
+		);
+	});
+
+	it("should return logged user informations", async () => {
+		// Arrange
+		const req = getMockReq();
+
+		const user = await User.findOne({
+			where: {
+				email,
+				firstName,
+				lastName
+			}
+		});
+
+		if(!user)
+			throw new Error("Failed to find a user");
+
+		res.locals = {
+			session: {
+				id: user.id
+			}
+		};
+
+		// Act
+		await me(req, res);
+
+		// Assert
+		expect(res.json).toHaveBeenCalledWith(
+			expect.objectContaining({
+				id: user.id,
+				email: user.email,
+				firstName: user.firstName,
+				lastName: user.lastName
+			})
+		);
 	});
 });
 
-afterAll(() => {
-	server.close();
+afterAll(async () => {
+
+	await User.destroy({
+		where: {
+			email
+		}
+	});
+	
+	await sequelize.close();
 });

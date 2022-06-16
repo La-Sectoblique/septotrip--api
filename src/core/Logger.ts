@@ -29,7 +29,7 @@ export class Logger {
 
 	debug(message: string): void {
 
-		if(process.env.NODE_ENV !== "production") {
+		if(process.env.NODE_ENV === "development") {
 			this.write(message, LogLevel.DEBUG, console.info);
 		}
 	}
