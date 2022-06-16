@@ -22,14 +22,14 @@ export function init(sequelize: Sequelize): void {
 	Day.init({
 		number: {
 			type: DataTypes.INTEGER,
-			allowNull: false
+			allowNull: false,
 		},
 		stepId: {
 			type: DataTypes.INTEGER,
 			allowNull: false
 		},
 		description: {
-			type: DataTypes.STRING,
+			type: DataTypes.TEXT,
 			allowNull: true
 		}
 	}, {

@@ -25,11 +25,17 @@ export function init(sequelize: Sequelize): void {
 	Step.init({
 		name: {
 			type: DataTypes.STRING,
-			allowNull: false
+			allowNull: false,
+			validate: {
+				len: [ 0, 255 ]
+			}
 		},
 		order: {
 			type: DataTypes.INTEGER,
-			allowNull: false
+			allowNull: false,
+			validate: {
+				min: 0
+			}
 		},
 		localisation: {
 			type: DataTypes.GEOMETRY("POINT"),

@@ -44,10 +44,13 @@ export function init(sequelize: Sequelize): void {
 	Point.init({
 		title: {
 			type: DataTypes.STRING,
-			allowNull: false
+			allowNull: false,
+			validate: {
+				len: [ 0, 255 ]
+			},
 		},
 		description: {
-			type: DataTypes.STRING,
+			type: DataTypes.TEXT,
 			allowNull: true
 		},
 		localisation: {

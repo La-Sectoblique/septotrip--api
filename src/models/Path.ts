@@ -14,7 +14,7 @@ export class Path extends Model<PathAttributes, PathInput> implements PathAttrib
 export function init(sequelize: Sequelize): void {
 	Path.init({
 		description: {
-			type: DataTypes.STRING,
+			type: DataTypes.TEXT,
 			allowNull: true
 		},
 		destinationId: {

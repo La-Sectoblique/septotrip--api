@@ -23,15 +23,25 @@ export function init(sequelize: Sequelize): void {
 		email: {
 			type: DataTypes.STRING,
 			allowNull: false,
-			unique: true
+			unique: true,
+			validate: {
+				isEmail: true,
+				len: [ 0, 255 ]
+			},
 		},
 		firstName: {
 			type: DataTypes.STRING,
 			allowNull: false,
+			validate: {
+				len: [ 0, 255 ]
+			},
 		},
 		lastName: {
 			type: DataTypes.STRING,
-			allowNull: false
+			allowNull: false,
+			validate: {
+				len: [ 0, 255 ]
+			},
 		},
 		hashedPassword: {
 			type: DataTypes.STRING,
