@@ -22,8 +22,6 @@ let trip: Trip;
 
 let name = faker.address.country();
 
-console.log(process.env);
-
 beforeAll(async () => {
 
 	sequelize = await Database();
