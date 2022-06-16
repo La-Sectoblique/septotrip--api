@@ -15,9 +15,6 @@ env:
 on:
   pull_request: 
     branches: [ master ]
-  # test
-  push:
-    branches: [ tg/adding-tests ]
 jobs:
   test:
     runs-on: ubuntu-latest
