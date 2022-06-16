@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { ValidationError } from "sequelize";
 import { User } from "../models/User";
 import InexistantResourceError from "../types/errors/InexistantResourceError";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
@@ -38,7 +39,16 @@ export async function register(request: Request, response: Response, next: NextF
 		hashedPassword
 	};
 
-	await User.create(input);
+	try {
+		await User.create(input);
+	}
+	catch(error) {
+		if(error instanceof ValidationError)
+			return next({ message: error.message, code: 400, name: "InvalidBodyError" } as InvalidBodyError);
+
+		return next(error);
+	}
+
 	response.json({ message: "User created ! Please log in" });
 	return;
 }

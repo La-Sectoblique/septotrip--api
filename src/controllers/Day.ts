@@ -1,17 +1,27 @@
 import { NextFunction, Request, Response } from "express";
+import { ValidationError } from "sequelize";
 import { Point } from "../models/Point";
 import InexistantResourceError from "../types/errors/InexistantResourceError";
+import InvalidBodyError from "../types/errors/InvalidBodyError";
 import { DayInput } from "../types/models/Day";
 
 export async function getDayByID(request: Request, response: Response) {
 	return response.json(response.locals.day);
 }
 
-export async function updateDay(request: Request, response: Response) {
+export async function updateDay(request: Request, response: Response, next: NextFunction) {
 	const day = response.locals.day;
 	const newAttributes: Partial<DayInput> = request.body;
 
-	await day.update(newAttributes);
+	try {
+		await day.update(newAttributes);
+	}
+	catch(error) {
+		if(error instanceof ValidationError)
+			return next({ message: error.message, code: 400, name: "InvalidBodyError" } as InvalidBodyError);
+		
+		return next(error);
+	}	
 
 	return response.json(day);
 }

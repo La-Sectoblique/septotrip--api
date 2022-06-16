@@ -23,7 +23,10 @@ export function init(sequelize: Sequelize) {
 	TodoEntry.init({
 		title: {
 			type: DataTypes.STRING,
-			allowNull: false
+			allowNull: false,
+			validate: {
+				len: [ 0, 255 ]
+			},
 		},
 		state: {
 			type: DataTypes.STRING,

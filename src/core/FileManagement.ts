@@ -1,4 +1,5 @@
-import { S3, Credentials } from "aws-sdk";
+import { S3, Credentials, AWSError } from "aws-sdk";
+import { PromiseResult } from "aws-sdk/lib/request";
 import { FileMetadata } from "../models/FileMetadata";
 import Loggers from "./Logger";
 
@@ -49,7 +50,7 @@ export default class FileManagement {
 		}
 	}
 
-	public async getFile(key: string, bucket: string) {
+	public async getFile(key: string, bucket: string): Promise<PromiseResult<S3.GetObjectOutput, AWSError>> {
 		return this.S3.getObject({
 			Bucket: bucket,
 			Key: key
