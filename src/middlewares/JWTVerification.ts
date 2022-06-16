@@ -32,21 +32,20 @@ export async function JWTVerification(request: Request, response: Response, next
 		return;
 	}
 
-	let session: Session;
+	const session: Session = decodedSession.session;
 
 	// on renouvelle le token
 	if(expiration === "grace") {
-		const { token, expires, issued } = encodeSession(decodedSession.session);
-		session = {
-			...decodedSession.session,
-			expires,
-			issued
-		};
+		const encodedSession = encodeSession({ 
+			id: decodedSession.session.id,
+			username: decodedSession.session.username,
+			dateCreated: Date.now()
+		});
 
-		response.setHeader(responseHeader, token);
-	}
-	else {
-		session = decodedSession.session;
+		response.setHeader(responseHeader, encodedSession.token);
+
+		session.issued = encodedSession.issued;
+		session.expires = encodedSession.expires;
 	}
 
 	const user = await User.findByPk(session.id);
