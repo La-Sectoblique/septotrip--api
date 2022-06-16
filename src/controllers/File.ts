@@ -148,7 +148,7 @@ export async function deleteFile(request: Request, response: Response) {
 	
 	await FileManagement.get().deleteFile(metadata.id.toString(), `${bucketPrefix}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
 
-	await FileMetadata.destroy();
+	await metadata.destroy();
 
 	response.json({ message: "File deleted" });
 }
