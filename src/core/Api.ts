@@ -17,6 +17,6 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/", router);
 
-app.listen(process.env.API_PORT ?? 3000, () => Loggers.getLogger("api").info(`Listening to port ${process.env.API_PORT ?? 3000}`));
+export const server = app.listen(process.env.API_PORT ?? 3000, () => Loggers.getLogger("api").info(`Listening to port ${process.env.API_PORT ?? 3000}`));
 
 export default app;
