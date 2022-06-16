@@ -1,0 +1,19 @@
+name: Lint api
+
+on:
+  pull_request: 
+    branches: [ dev, master ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Install dépendencies
+      run: yarn install
+
+    - name: Lint & build
+      run: yarn build
