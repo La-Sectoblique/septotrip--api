@@ -142,7 +142,7 @@ export async function updateMetadata(request: Request, response: Response) {
 }
 
 export async function deleteFile(request: Request, response: Response) {
-	const metadata: FileMetadata = response.locals.fileMetada;
+	const metadata: FileMetadata = response.locals.fileMetadata;
 	const trip: Trip = response.locals.trip;
 	const bucketPrefix = getBucketPrefix();
 	
