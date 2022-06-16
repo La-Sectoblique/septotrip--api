@@ -13,6 +13,8 @@ const password = faker.internet.password();
 const firstName = faker.name.firstName();
 const lastName = faker.name.lastName();
 
+jest.setTimeout(30 * 1000); 
+
 beforeAll(async () => {
 	sequelize = await Database();
 });

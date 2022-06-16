@@ -22,6 +22,8 @@ let trip: Trip;
 
 let name = faker.address.country();
 
+jest.setTimeout(30 * 1000); 
+
 beforeAll(async () => {
 
 	sequelize = await Database();
