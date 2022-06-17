@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { ValidationError } from "sequelize";
 import { Spent } from "../models/Spent";
 import InvalidBodyError from "../types/errors/InvalidBodyError";
 import { isSpentInput, SpentInput } from "../types/models/Spent";
@@ -13,7 +14,16 @@ export async function newSpent(request: Request, response: Response, next: NextF
 	if(!isSpentInput(input))
 		return next({ message: "Invalid request body", code: 400, name: "InvalidBodyError" } as InvalidBodyError);
 
-	const spent = await Spent.create(input);
+	let spent;
+	try {
+		spent = await Spent.create(input);
+	}
+	catch(error) {
+		if(error instanceof ValidationError)
+			return next({ message: error.message, code: 400, name: "InvalidBodyError" } as InvalidBodyError);
+		
+		return next(error);
+	}
 
 	if(!request.body.beneficiaries) {
 		request.body.beneficiaries = [];
@@ -38,11 +48,19 @@ export async function getSpentById(request: Request, response: Response) {
 	response.json(response.locals.spent);
 }
 
-export async function updateSpent(request: Request, response: Response) {
+export async function updateSpent(request: Request, response: Response, next: NextFunction) {
 	const spent: Spent = response.locals.spent;
 	const newAttributes: Partial<SpentInput> = request.body;
 
-	await spent.update(newAttributes);
+	try {
+		await spent.update(newAttributes);
+	}
+	catch(error) {
+		if(error instanceof ValidationError)
+			return next({ message: error.message, code: 400, name: "InvalidBodyError" } as InvalidBodyError);
+		
+		return next(error);
+	}
 
 	response.json(spent);
 }
