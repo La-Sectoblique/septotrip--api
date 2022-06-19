@@ -60,6 +60,23 @@ export async function getAllPublicTrips(request: Request, response: Response) {
 	response.json(trips);
 }
 
+export async function getTripAuthor(request: Request, response: Response) {
+	const trip: Trip = response.locals.trip;
+
+	const author = await User.findByPk(trip.authorId, {
+		attributes: {
+			exclude: [
+				"hashedPassword",
+				"email"
+			]
+		}
+	});
+
+	if(!author) throw new Error("Wtf pas d'auteur ???");
+
+	response.json(author);
+}
+
 export async function getUserTrips(request: Request, response: Response) {
 
 	const trips = await response.locals.user.getTrips();
