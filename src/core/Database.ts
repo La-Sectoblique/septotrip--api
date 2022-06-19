@@ -47,5 +47,5 @@ export default async function() {
 		associate();
 	}
 
-	await sequelize.sync({ alter: isDev, force: isDev });
+	return sequelize.sync({ alter: isDev, force: isDev });
 }

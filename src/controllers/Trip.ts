@@ -76,7 +76,7 @@ export async function updateTrip(request: Request, response: Response, next: Nex
 	const newAttributes: Partial<Trip> = request.body;
 
 	if(newAttributes.visibility && !isVisibility(newAttributes.visibility)) {
-		next({ message: "Invalid visibility", code: 404, name: "InvalidBodyError" } as InvalidBodyError);
+		next({ message: "Invalid visibility", code: 400, name: "InvalidBodyError" } as InvalidBodyError);
 		return;
 	}
 
@@ -131,7 +131,13 @@ export async function addingMemberToTrip(request: Request, response: Response, n
 		return;
 	}
 
-	trip.addUser(newTraveler);
+	try {
+		await trip.addUser(newTraveler);
+	}
+	catch(error) {
+		console.error(error);
+		throw error;
+	}
 
 	response.json({ message: "User added to trip" });
 }
@@ -148,6 +154,7 @@ export async function removeMemberFromTrip(request: Request, response: Response,
 	}
 
 	if(!(await trip.getUsers()).find(usr => usr.id === parseInt(userId))) {
+
 		next({ message: "This user is not in the trip", code: 404, name: "InexistantResourceError"} as InexistantResourceError);
 		return;
 	}
