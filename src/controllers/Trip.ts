@@ -9,6 +9,7 @@ import NoIdProvidedError from "../types/errors/NoIdProvidedError";
 import { isTripInput } from "../types/models/Trip";
 import { UserAttributes } from "../types/models/User";
 import { isVisibility } from "../types/utils/Visibility";
+import { slugify } from "../utils/File";
 
 export async function createTrip(request: Request, response: Response, next: NextFunction) {
 
@@ -40,7 +41,7 @@ export async function createTrip(request: Request, response: Response, next: Nex
 	trip.addUser(user);
 
 	try {
-		await FileManagement.get().createBucketIfNotExist(`${process.env.NODE_ENV === "production" ? "prod" : "dev"}-${trip.id}-${trip.name.replaceAll(" ", "-").toLowerCase()}`);
+		await FileManagement.get().createBucketIfNotExist(`${process.env.NODE_ENV === "production" ? "prod" : "dev"}-${trip.id}-${slugify(trip.name)}`);
 	}
 	catch(error) {
 		return next(error);
@@ -57,6 +58,23 @@ export async function getAllPublicTrips(request: Request, response: Response) {
 	});
 
 	response.json(trips);
+}
+
+export async function getTripAuthor(request: Request, response: Response) {
+	const trip: Trip = response.locals.trip;
+
+	const author = await User.findByPk(trip.authorId, {
+		attributes: {
+			exclude: [
+				"hashedPassword",
+				"email"
+			]
+		}
+	});
+
+	if(!author) throw new Error("Wtf pas d'auteur ???");
+
+	response.json(author);
 }
 
 export async function getUserTrips(request: Request, response: Response) {
