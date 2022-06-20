@@ -24,7 +24,7 @@ export async function LoadTrip(request: Request, response: Response, next: NextF
 	// user verification
 	const userTrips = await response.locals.user.getTrips();
 
-	if(!userTrips.map( (trip: Trip) => trip.id).includes(tripId)) {
+	if( response.locals.user && !userTrips.map( (trip: Trip) => trip.id).includes(tripId)) {
 		next({ message: "You are not part of this trip", code: 403, name: "UnauthorizedError" } as UnauthorizedError);
 		return;
 	}
