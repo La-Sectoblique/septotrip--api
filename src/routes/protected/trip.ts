@@ -22,11 +22,6 @@ router.route("/trips/:tripId")
 	.delete(deleteTrip)
 	.all(MethodNotAllowed);
 
-router.route("/trips/:tripId/author")
-	.all(LoadTrip)
-	.get(getTripAuthor)
-	.all(MethodNotAllowed);
-
 router.route("/trips/:tripId/users")
 	.all(LoadTrip)
 	.get(getTripUsers)

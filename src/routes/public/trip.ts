@@ -1,10 +1,17 @@
 import { Router } from "express";
-import { getAllPublicTrips } from "../../controllers/Trip";
+import { getAllPublicTrips, getTripAuthor } from "../../controllers/Trip";
+import { LoadTrip } from "../../middlewares/loaders/TripLoader";
+import MethodNotAllowed from "../../middlewares/MethodNotAllowed";
 
 const router = Router();
 
 router.route("/trips")
-	.get(getAllPublicTrips);
+	.get(getAllPublicTrips)
+	.all(MethodNotAllowed);
 
+router.route("/trips/:tripId/author")
+	.all(LoadTrip)
+	.get(getTripAuthor)
+	.all(MethodNotAllowed);
 
 export default router;
