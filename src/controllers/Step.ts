@@ -202,16 +202,19 @@ export async function updateStepOrder(request: Request, response: Response) {
 	);
 
 	// create all missing paths
-	for(const s of steps) {
+	for(let i = 0; i < steps.length; i++) {
+
 		const path = await Path.findOne({
 			where: {
-				destinationId: s.id
+				destinationId: steps[i].id
 			}
 		});
-	
+
+		await steps[i].update({ order: i });
+
 		if(path) continue;
 
-		await Path.create({ destinationId: s.id });
+		await Path.create({ destinationId: steps[i].id });
 	}
 
 	response.json(steps);

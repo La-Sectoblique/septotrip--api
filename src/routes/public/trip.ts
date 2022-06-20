@@ -6,9 +6,8 @@ import MethodNotAllowed from "../../middlewares/MethodNotAllowed";
 const router = Router();
 
 router.route("/trips")
-	.get(getAllPublicTrips)
-	.all(MethodNotAllowed);
-
+	.get(getAllPublicTrips);
+	
 router.route("/trips/:tripId/author")
 	.all(LoadTrip)
 	.get(getTripAuthor)
