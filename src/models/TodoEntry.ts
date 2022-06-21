@@ -31,7 +31,7 @@ export function init(sequelize: Sequelize) {
 		state: {
 			type: DataTypes.STRING,
 			allowNull: false,
-			values: getEnumValues(TodoState)
+			values: getEnumValues(TodoState) as string[]
 		},
 		tripId: {
 			type: DataTypes.INTEGER,

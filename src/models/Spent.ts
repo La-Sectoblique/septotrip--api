@@ -29,7 +29,7 @@ export function init(sequelize: Sequelize) {
 			type: DataTypes.STRING,
 			allowNull: false,
 			defaultValue: "OTHER",
-			values: getEnumValues(SpentCategory)
+			values: getEnumValues(SpentCategory) as string[]
 		},
 		authorId: {
 			type: DataTypes.INTEGER,

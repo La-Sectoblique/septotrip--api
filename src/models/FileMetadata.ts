@@ -49,7 +49,7 @@ export function init(sequelize: Sequelize) {
 		fileType: {
 			type: DataTypes.STRING,
 			allowNull: false,
-			values: getEnumValues(FileType)
+			values: getEnumValues(FileType) as string[]
 		},
 		tempFileId: {
 			type: DataTypes.STRING,
