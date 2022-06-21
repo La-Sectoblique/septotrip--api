@@ -18,7 +18,10 @@ export async function createTrip(request: Request, response: Response, next: Nex
 		...request.body
 	};
 
-	if(!isTripInput(input)) {
+	if(
+		!isTripInput(input) ||
+		slugify(input.name).length === 0
+	) {
 		next({ message: "Invalid request body", code: 400, name: "InvalidBodyError" } as InvalidBodyError);
 		return;
 	}
