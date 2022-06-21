@@ -1,6 +1,5 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 import { TodoEntryAttributes, TodoEntryInput, TodoState } from "../types/models/Todo";
-import { getEnumValues } from "../types/utils/Enum";
 import { Path } from "./Path";
 import { Point } from "./Point";
 import { Step } from "./Step";
@@ -31,7 +30,6 @@ export function init(sequelize: Sequelize) {
 		state: {
 			type: DataTypes.STRING,
 			allowNull: false,
-			values: getEnumValues(TodoState) as string[]
 		},
 		tripId: {
 			type: DataTypes.INTEGER,
