@@ -28,7 +28,7 @@ export function init(sequelize: Sequelize) {
 			},
 		},
 		state: {
-			type: DataTypes.STRING,
+			type: DataTypes.INTEGER,
 			allowNull: false,
 		},
 		tripId: {
