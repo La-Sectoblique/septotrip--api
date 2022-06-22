@@ -45,7 +45,7 @@ export async function uploadFile(request: Request, response: Response, next: Nex
 	const bucketPrefix = getBucketPrefix();
 
 	try {
-		await FileManagement.get().uploadFile(fileMetadata, `${bucketPrefix}-${trip.id}-${slugify(trip.name)}`, file.data);
+		await FileManagement.get().uploadFile(fileMetadata, `${bucketPrefix}-${trip.id}`, file.data);
 	}
 	catch(error) {
 		return next(error);
@@ -81,7 +81,7 @@ export async function getFile(request: Request, response: Response, next: NextFu
 
 	let res: PromiseResult<S3.GetObjectOutput, AWSError>;
 	try {
-		res = await FileManagement.get().getFile(metadata.id.toString(), `${bucketPrefix}-${trip.id}-${slugify(trip.name)}`);
+		res = await FileManagement.get().getFile(metadata.id.toString(), `${bucketPrefix}-${trip.id}`);
 	}
 	catch(error) {
 		return next(error);
@@ -179,7 +179,7 @@ export async function deleteFile(request: Request, response: Response) {
 	const trip: Trip = response.locals.trip;
 	const bucketPrefix = getBucketPrefix();
 	
-	await FileManagement.get().deleteFile(metadata.id.toString(), `${bucketPrefix}-${trip.id}-${slugify(trip.name)}`);
+	await FileManagement.get().deleteFile(metadata.id.toString(), `${bucketPrefix}-${trip.id}`);
 
 	await metadata.destroy();
 
