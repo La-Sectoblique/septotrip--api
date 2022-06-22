@@ -9,7 +9,7 @@ import NoIdProvidedError from "../types/errors/NoIdProvidedError";
 import { isTripInput } from "../types/models/Trip";
 import { UserAttributes } from "../types/models/User";
 import { isVisibility } from "../types/utils/Visibility";
-import { slugify } from "../utils/File";
+import { getBucketPrefix, slugify } from "../utils/File";
 
 export async function createTrip(request: Request, response: Response, next: NextFunction) {
 
@@ -43,8 +43,10 @@ export async function createTrip(request: Request, response: Response, next: Nex
 	
 	trip.addUser(user);
 
+	const bucketPrefix = getBucketPrefix();
+
 	try {
-		await FileManagement.get().createBucketIfNotExist(`${process.env.NODE_ENV === "production" ? "prod" : "dev"}-${trip.id}-${slugify(trip.name)}`);
+		await FileManagement.get().createBucketIfNotExist(`${bucketPrefix}-${trip.id}`);
 	}
 	catch(error) {
 		return next(error);
